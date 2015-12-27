@@ -3,7 +3,7 @@ package tv.loilo.promise;
 /**
  * Created by Junpei on 2015/10/26.
  */
-public final class SuccessParams<T> implements ExecutionContext {
+public class SuccessParams<T> implements ExecutionContext {
     private final T mValue;
 
     private final CancelToken mCancelToken;
@@ -12,7 +12,7 @@ public final class SuccessParams<T> implements ExecutionContext {
 
     private final Object mTag;
 
-    public SuccessParams(final T value, final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
+    public SuccessParams(T value, CancelToken cancelToken, CloseableStack scope, Object tag) {
         mValue = value;
         mCancelToken = cancelToken;
         mScope = scope;

@@ -10,12 +10,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Created by Junpei on 2015/10/07.
  */
-public class Dispatcher {
+public final class Dispatcher {
 
     private static Dispatcher mMainDispatcher = null;
     private final Handler mHandler;
 
-    public Dispatcher(final Looper looper) {
+    public Dispatcher(Looper looper) {
         mHandler = new Handler(looper);
     }
 

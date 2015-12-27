@@ -5,5 +5,5 @@ package tv.loilo.promise;
  */
 public interface SuccessCallback<TIn, TOut> {
 
-    Deferred<TOut> run(final SuccessParams<TIn> params) throws Exception;
+    Deferred<TOut> run(SuccessParams<TIn> params) throws Exception;
 }

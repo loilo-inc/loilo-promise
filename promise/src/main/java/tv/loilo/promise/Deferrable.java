@@ -41,15 +41,15 @@ public final class Deferrable<T> implements Deferred<T> {
         return result;
     }
 
-    public void setCancellable(final Cancellable cancellable) {
-        mCancellable = cancellable;
-    }
-
-    public void setResult(final Result<T> result) {
+    public void setResult(Result<T> result) {
         mResultPipe.set(result);
     }
 
-    public void setSucceeded(final T value) {
+    public void setCancellable(Cancellable cancellable) {
+        mCancellable = cancellable;
+    }
+
+    public void setSucceeded(T value) {
         setResult(Results.success(value));
     }
 
@@ -57,7 +57,7 @@ public final class Deferrable<T> implements Deferred<T> {
         setResult(Results.<T>cancel());
     }
 
-    public void setFailed(final Exception e) {
+    public void setFailed(Exception e) {
         setResult(Results.<T>fail(e));
     }
 }

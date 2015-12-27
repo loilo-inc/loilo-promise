@@ -16,12 +16,12 @@ import java.util.concurrent.TimeUnit;
 import tv.loilo.promise.Defer;
 import tv.loilo.promise.Deferred;
 import tv.loilo.promise.Dispatcher;
-import tv.loilo.promise.EntryFunction;
-import tv.loilo.promise.EntryParams;
 import tv.loilo.promise.Promise;
 import tv.loilo.promise.Promises;
 import tv.loilo.promise.Result;
 import tv.loilo.promise.Transfer;
+import tv.loilo.promise.WhenCallback;
+import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.support.ProgressPromiseFactory;
 import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
@@ -89,9 +89,9 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment imp
             @NonNull
             @Override
             public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader<SampleProgressBarDialogFragment, Void, Integer> loader) {
-                return Promises.when(new EntryFunction<Void>() {
+                return Promises.when(new WhenCallback<Void>() {
                     @Override
-                    public Deferred<Void> run(EntryParams params) throws Exception {
+                    public Deferred<Void> run(WhenParams params) throws Exception {
 
                         for (int i = 0; i < 100; ++i) {
                             loader.reportProgress(new Transfer<>(params, i));

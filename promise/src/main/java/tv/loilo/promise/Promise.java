@@ -7,29 +7,29 @@ import java.util.concurrent.ExecutorService;
  */
 public interface Promise<TOut> extends Submittable {
 
-    Deferred<TOut> get(final TaggedCancelState state);
+    Deferred<TOut> get(TaggedCancelState state);
 
 
-    Deferred<TOut> getOn(final ExecutorService executorService, final Tagged state);
+    Deferred<TOut> getOn(ExecutorService executorService, Tagged state);
 
 
-    Promise<TOut> promiseOn(final ExecutorService executorService);
+    Promise<TOut> promiseOn(ExecutorService executorService);
 
 
-    <TNextOut> Promise<TNextOut> then(final Continuation<TOut, TNextOut> continuation);
+    <TNextOut> Promise<TNextOut> then(ThenCallback<TOut, TNextOut> thenCallback);
 
 
-    Promise<TOut> watch(final WatchCallback<TOut> watchCallback);
+    Promise<TOut> watch(WatchCallback<TOut> watchCallback);
 
 
-    <TNextOut> Promise<TNextOut> succeeded(final SuccessCallback<TOut, TNextOut> successCallback);
+    <TNextOut> Promise<TNextOut> succeeded(SuccessCallback<TOut, TNextOut> successCallback);
 
 
-    Promise<TOut> failed(final FailCallback<TOut> failCallback);
+    Promise<TOut> failed(FailCallback<TOut> failCallback);
 
 
-    Submittable finish(final FinishCallback<TOut> finishCallback);
+    Submittable finish(FinishCallback<TOut> finishCallback);
 
 
-    <TReplace> Promise<TReplace> exchange(final TReplace replace);
+    <TReplace> Promise<TReplace> exchange(TReplace replace);
 }

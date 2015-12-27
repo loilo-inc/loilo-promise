@@ -23,7 +23,7 @@ public final class Pipe<T> {
         mGetLock = new ReentrantLock();
     }
 
-    public void set(final T value) {
+    public void set(T value) {
         if (mHasValue.getAndSet(true)) {
             return;
         }

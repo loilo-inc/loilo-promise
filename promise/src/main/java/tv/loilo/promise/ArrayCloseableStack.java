@@ -17,7 +17,7 @@ public final class ArrayCloseableStack implements CloseableStack, Closeable {
     }
 
     @Override
-    public <T extends Closeable> T push(final T closeable) {
+    public <T extends Closeable> T push(T closeable) {
         mDeque.add(closeable);
         return closeable;
     }

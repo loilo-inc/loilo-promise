@@ -10,7 +10,7 @@ public final class Results {
 
     }
 
-    public static <T> Result<T> success(final T value) {
+    public static <T> Result<T> success(T value) {
         return new SimpleResult<>(true, value, null, CancelTokens.NONE);
     }
 
@@ -18,7 +18,7 @@ public final class Results {
         return new SimpleResult<>(false, null, null, CancelTokens.CANCELED);
     }
 
-    public static <T> Result<T> fail(final Exception e) {
+    public static <T> Result<T> fail(Exception e) {
         return new SimpleResult<>(false, null, e, CancelTokens.NONE);
     }
 
@@ -26,7 +26,7 @@ public final class Results {
         return new SimpleResult<>(false, null, new UnsupportedOperationException("Not implementation."), CancelTokens.NONE);
     }
 
-    public static <TIn, TOut> Result<TOut> exchangeValue(final Result<TIn> result, TOut replace) {
+    public static <TIn, TOut> Result<TOut> exchangeValue(Result<TIn> result, TOut replace) {
         if (result.getCancelToken().isCanceled()) {
             return cancel();
         }
@@ -37,7 +37,7 @@ public final class Results {
         return success(replace);
     }
 
-    public static <T> Result<T> exchangeCancelToken(final Result<T> result, final CancelToken cancelToken) {
+    public static <T> Result<T> exchangeCancelToken(Result<T> result, CancelToken cancelToken) {
         if (result.getCancelToken().isCanceled()) {
             //キャンセル済みだったらそのまま返していい。
             return result;
@@ -58,9 +58,9 @@ public final class Results {
         private final CancelToken mCancelToken;
 
         private SimpleResult(
-                final boolean hasValue, final T value,
-                final Exception exception,
-                final CancelToken cancelToken) {
+                boolean hasValue, T value,
+                Exception exception,
+                CancelToken cancelToken) {
             mHasValue = hasValue;
             mValue = value;
             mException = exception;

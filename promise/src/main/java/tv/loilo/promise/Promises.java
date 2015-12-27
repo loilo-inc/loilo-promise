@@ -9,64 +9,64 @@ import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//Javaの仕様的でSleepやLock等のブロック処理を抜ける仕組みがThread.interruptしかない。
+//Javaの仕様でSleepやLock等のブロック処理を抜ける仕組みがThread.interruptしかない。
 // Threadの割り込み処理によるキャンセル処理をうまくフレームワーク化したいので作っているライブラリになります。
 public final class Promises {
     private static final ExecutorService mDefaultExecutorService = Executors.newCachedThreadPool();
 
-    public static <TOut> Promise<TOut> when(final EntryFunction<TOut> entryFunction) {
-        return new InitialPromise<>(entryFunction);
+    public static <TOut> Promise<TOut> when(WhenCallback<TOut> whenCallback) {
+        return new InitialPromise<>(whenCallback);
     }
 
     public static <TOut> Promise<TOut> success(final TOut out) {
-        return when(new EntryFunction<TOut>() {
+        return when(new WhenCallback<TOut>() {
 
             @Override
-            public Deferred<TOut> run(final EntryParams params) throws Exception {
+            public Deferred<TOut> run(final WhenParams params) throws Exception {
                 return Defer.success(out);
             }
         });
     }
 
     public static <TOut> Promise<TOut> fail(final Exception e) {
-        return when(new EntryFunction<TOut>() {
+        return when(new WhenCallback<TOut>() {
 
             @Override
-            public Deferred<TOut> run(final EntryParams params) throws Exception {
+            public Deferred<TOut> run(WhenParams params) throws Exception {
                 return Defer.fail(e);
             }
         });
     }
 
     public static <TOut> Promise<TOut> cancel() {
-        return when(new EntryFunction<TOut>() {
+        return when(new WhenCallback<TOut>() {
 
             @Override
-            public Deferred<TOut> run(final EntryParams params) throws Exception {
+            public Deferred<TOut> run(WhenParams params) throws Exception {
                 return Defer.cancel();
             }
         });
     }
 
     public static <TOut> Promise<TOut> notImpl() {
-        return when(new EntryFunction<TOut>() {
+        return when(new WhenCallback<TOut>() {
 
             @Override
-            public Deferred<TOut> run(final EntryParams params) throws Exception {
+            public Deferred<TOut> run(WhenParams params) throws Exception {
                 return Defer.notImpl();
             }
         });
     }
 
-    public static <TOut> Repeat<TOut> repeat(final EntryFunction<TOut> entryFunction) {
+    public static <TOut> Repeat<TOut> repeat(final RepeatCallback<TOut> callback) {
         return new Repeat<TOut>() {
 
             @Override
-            public Promise<TOut> until(final Condition<TOut> condition) {
-                return when(new EntryFunction<TOut>() {
+            public Promise<TOut> until(final UntilCallback<TOut> untilCallback) {
+                return when(new WhenCallback<TOut>() {
 
                     @Override
-                    public Deferred<TOut> run(final EntryParams params) throws Exception {
+                    public Deferred<TOut> run(final WhenParams params) throws Exception {
 
                         final Detachable<ArrayCloseableStack> scope = new Detachable<>();
                         try {
@@ -86,7 +86,7 @@ public final class Promises {
                                     deferred = Defer.cancel();
                                 } else {
                                     try {
-                                        deferred = entryFunction.run(new EntryParams(params.getCancelToken(), scope.ref(), params.getTag()));
+                                        deferred = callback.run(new RepeatParams(params.getCancelToken(), scope.ref(), params.getTag()));
                                     } catch (final InterruptedException e) {
                                         deferred = Defer.cancel();
                                         Thread.currentThread().interrupt();
@@ -100,7 +100,7 @@ public final class Promises {
                                 result = Results.exchangeCancelToken(deferred.getResult(), params.getCancelToken());
                             }
                             while (!result.getCancelToken().isCanceled()
-                                    && !condition.run(new ResultParams<>(result, scope.ref(), params.getTag())));
+                                    && !untilCallback.run(new UntilParams<>(result, scope.ref(), params.getTag())));
 
                             params.getScope().push(scope.detach());
 
@@ -114,11 +114,11 @@ public final class Promises {
         };
     }
 
-    public static <TIn> Promise<Void> forEach(final Iterable<TIn> ite, final SuccessCallback<TIn, ForEachOp> callback) {
-        return when(new EntryFunction<Void>() {
+    public static <TIn> Promise<Void> forEach(final Iterable<TIn> ite, final ForEachCallback<TIn> callback) {
+        return when(new WhenCallback<Void>() {
 
             @Override
-            public Deferred<Void> run(EntryParams args) throws Exception {
+            public Deferred<Void> run(WhenParams args) throws Exception {
                 for (TIn element : ite) {
                     if (args.getCancelToken().isCanceled()) {
                         return Defer.cancel();
@@ -126,7 +126,7 @@ public final class Promises {
 
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
-                        final Deferred<ForEachOp> result = callback.run(new SuccessParams<>(element, args.getCancelToken(), scope, args.getTag()));
+                        final Deferred<ForEachOp> result = callback.run(new ForEachParams<>(element, args.getCancelToken(), scope, args.getTag()));
                         final ForEachOp next = result.getResult().safeGetValue();
                         if (next == ForEachOp.BREAK) {
                             return Defer.success(null);
@@ -304,19 +304,19 @@ public final class Promises {
 
         @Override
         public void execute(final Result<TIn> input, final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
-            mFinishCallback.run(new ResultParams<>(input, scope, tag));
+            mFinishCallback.run(new FinishParams<>(input, scope, tag));
         }
     }
 
     private static final class ContinuationPromise<TIn, TOut> implements Promise<TOut>, NextPoint<TIn> {
 
         private final EntryPoint mEntryPoint;
-        private final Continuation<TIn, TOut> mContinuation;
+        private final ThenCallback<TIn, TOut> mThenCallback;
         private NextPoint<TOut> mNextPoint;
 
-        public ContinuationPromise(final EntryPoint entryPoint, final Continuation<TIn, TOut> continuation) {
+        public ContinuationPromise(final EntryPoint entryPoint, final ThenCallback<TIn, TOut> thenCallback) {
             mEntryPoint = entryPoint;
-            mContinuation = continuation;
+            mThenCallback = thenCallback;
         }
 
         public void setNextPoint(NextPoint<TOut> nextPoint) {
@@ -328,7 +328,7 @@ public final class Promises {
             Deferred<TOut> deferred;
             //ここはキャンセルしてても必ずコールバックを呼ぶようにしています。
             try {
-                deferred = mContinuation.run(new ResultParams<>(input, scope, tag));
+                deferred = mThenCallback.run(new ThenParams<>(input, scope, tag));
             } catch (final InterruptedException e) {
                 deferred = Defer.cancel();
                 Thread.currentThread().interrupt();
@@ -367,7 +367,7 @@ public final class Promises {
 
             final Canceller canceller = finish(new FinishCallback<TOut>() {
                 @Override
-                public void run(final ResultParams<TOut> params) {
+                public void run(final FinishParams<TOut> params) {
                     deferred.setResult(params.asResult());
                 }
             }).submitOn(executorService, state.getTag());
@@ -380,10 +380,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
-            return when(new EntryFunction<TOut>() {
+            return when(new WhenCallback<TOut>() {
 
                 @Override
-                public Deferred<TOut> run(EntryParams params) throws Exception {
+                public Deferred<TOut> run(WhenParams params) throws Exception {
                     return getOn(executorService, params);
                 }
             });
@@ -415,8 +415,8 @@ public final class Promises {
 
 
         @Override
-        public <TNextOut> Promise<TNextOut> then(Continuation<TOut, TNextOut> continuation) {
-            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, continuation);
+        public <TNextOut> Promise<TNextOut> then(ThenCallback<TOut, TNextOut> thenCallback) {
+            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, thenCallback);
             setNextPoint(continuationTask);
             return continuationTask;
         }
@@ -424,10 +424,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> watch(final WatchCallback<TOut> watchCallback) {
-            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new Continuation<TOut, TOut>() {
+            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new ThenCallback<TOut, TOut>() {
 
                 @Override
-                public Deferred<TOut> run(ResultParams<TOut> params) throws Exception {
+                public Deferred<TOut> run(ThenParams<TOut> params) throws Exception {
                     watchCallback.run(params);
                     return params.asDeferred();
                 }
@@ -439,10 +439,10 @@ public final class Promises {
 
         @Override
         public <TNextOut> Promise<TNextOut> succeeded(final SuccessCallback<TOut, TNextOut> successCallback) {
-            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new Continuation<TOut, TNextOut>() {
+            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new ThenCallback<TOut, TNextOut>() {
 
                 @Override
-                public Deferred<TNextOut> run(final ResultParams<TOut> params) throws Exception {
+                public Deferred<TNextOut> run(final ThenParams<TOut> params) throws Exception {
                     return runSuccessCallback(params, successCallback);
                 }
             });
@@ -453,10 +453,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> failed(final FailCallback<TOut> failCallback) {
-            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new Continuation<TOut, TOut>() {
+            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new ThenCallback<TOut, TOut>() {
 
                 @Override
-                public Deferred<TOut> run(final ResultParams<TOut> params) throws Exception {
+                public Deferred<TOut> run(final ThenParams<TOut> params) throws Exception {
                     return runFailCallback(params, failCallback);
                 }
             });
@@ -475,10 +475,10 @@ public final class Promises {
 
         @Override
         public <TReplace> Promise<TReplace> exchange(final TReplace replace) {
-            return then(new Continuation<TOut, TReplace>() {
+            return then(new ThenCallback<TOut, TReplace>() {
 
                 @Override
-                public Deferred<TReplace> run(ResultParams<TOut> params) throws Exception {
+                public Deferred<TReplace> run(ThenParams<TOut> params) throws Exception {
                     return Defer.exchangeValue(params.asResult(), replace);
                 }
             });
@@ -487,11 +487,11 @@ public final class Promises {
 
     private static final class InitialPromise<TOut> implements Promise<TOut>, EntryPoint {
 
-        private final EntryFunction<TOut> mEntryFunction;
+        private final WhenCallback<TOut> mWhenCallback;
         private NextPoint<TOut> mNextPoint;
 
-        public InitialPromise(EntryFunction<TOut> entryFunction) {
-            mEntryFunction = entryFunction;
+        public InitialPromise(WhenCallback<TOut> whenCallback) {
+            mWhenCallback = whenCallback;
         }
 
         public void setNextPoint(NextPoint<TOut> nextPoint) {
@@ -507,7 +507,7 @@ public final class Promises {
                 handle = Defer.cancel();
             } else {
                 try {
-                    handle = mEntryFunction.run(new EntryParams(cancelToken, scope, tag));
+                    handle = mWhenCallback.run(new WhenParams(cancelToken, scope, tag));
                 } catch (final InterruptedException e) {
                     handle = Defer.cancel();
                     Thread.currentThread().interrupt();
@@ -548,7 +548,7 @@ public final class Promises {
 
             final Canceller canceller = finish(new FinishCallback<TOut>() {
                 @Override
-                public void run(final ResultParams<TOut> args) {
+                public void run(final FinishParams<TOut> args) {
                     deferred.setResult(args.asResult());
                 }
             }).submitOn(executorService, state.getTag());
@@ -561,10 +561,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
-            return when(new EntryFunction<TOut>() {
+            return when(new WhenCallback<TOut>() {
 
                 @Override
-                public Deferred<TOut> run(final EntryParams params) throws Exception {
+                public Deferred<TOut> run(final WhenParams params) throws Exception {
                     return getOn(executorService, params);
                 }
             });
@@ -695,8 +695,8 @@ public final class Promises {
 
 
         @Override
-        public <TNextOut> Promise<TNextOut> then(final Continuation<TOut, TNextOut> continuation) {
-            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(this, continuation);
+        public <TNextOut> Promise<TNextOut> then(final ThenCallback<TOut, TNextOut> thenCallback) {
+            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(this, thenCallback);
             setNextPoint(continuationTask);
             return continuationTask;
         }
@@ -704,10 +704,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> watch(final WatchCallback<TOut> watchCallback) {
-            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(this, new Continuation<TOut, TOut>() {
+            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(this, new ThenCallback<TOut, TOut>() {
 
                 @Override
-                public Deferred<TOut> run(ResultParams<TOut> params) throws Exception {
+                public Deferred<TOut> run(ThenParams<TOut> params) throws Exception {
                     watchCallback.run(params);
                     return params.asDeferred();
                 }
@@ -719,10 +719,10 @@ public final class Promises {
 
         @Override
         public <TNextOut> Promise<TNextOut> succeeded(final SuccessCallback<TOut, TNextOut> successCallback) {
-            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(this, new Continuation<TOut, TNextOut>() {
+            final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(this, new ThenCallback<TOut, TNextOut>() {
 
                 @Override
-                public Deferred<TNextOut> run(final ResultParams<TOut> params) throws Exception {
+                public Deferred<TNextOut> run(final ThenParams<TOut> params) throws Exception {
                     return runSuccessCallback(params, successCallback);
                 }
             });
@@ -733,10 +733,10 @@ public final class Promises {
 
         @Override
         public Promise<TOut> failed(final FailCallback<TOut> failCallback) {
-            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(this, new Continuation<TOut, TOut>() {
+            final ContinuationPromise<TOut, TOut> continuationTask = new ContinuationPromise<>(this, new ThenCallback<TOut, TOut>() {
 
                 @Override
-                public Deferred<TOut> run(final ResultParams<TOut> params) throws Exception {
+                public Deferred<TOut> run(final ThenParams<TOut> params) throws Exception {
                     return runFailCallback(params, failCallback);
                 }
             });
@@ -755,10 +755,10 @@ public final class Promises {
 
         @Override
         public <TReplace> Promise<TReplace> exchange(final TReplace replace) {
-            return then(new Continuation<TOut, TReplace>() {
+            return then(new ThenCallback<TOut, TReplace>() {
 
                 @Override
-                public Deferred<TReplace> run(final ResultParams<TOut> params) throws Exception {
+                public Deferred<TReplace> run(final ThenParams<TOut> params) throws Exception {
                     return Defer.exchangeValue(params.asResult(), replace);
                 }
             });

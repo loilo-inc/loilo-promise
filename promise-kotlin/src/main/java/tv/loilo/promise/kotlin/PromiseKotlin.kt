@@ -18,15 +18,15 @@ fun <T> callOnUi(process: () -> T): Deferred<T> {
     return Dispatcher.getMainDispatcher().call(process)
 }
 
-fun <T> promiseWhen(f: (EntryParams) -> Deferred<T>): Promise<T> {
+fun <T> promiseWhen(f: (WhenParams) -> Deferred<T>): Promise<T> {
     return Promises.`when`(f)
 }
 
-fun <T> promiseRepeat(f: (EntryParams) -> Deferred<T>): Repeat<T> {
+fun <T> promiseRepeat(f: (RepeatParams) -> Deferred<T>): Repeat<T> {
     return Promises.repeat(f)
 }
 
-fun <T> promiseForEach(ite: Iterable<T>, f: (SuccessParams<T>) -> Deferred<ForEachOp>): Promise<Unit> {
+fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T>) -> Deferred<ForEachOp>): Promise<Unit> {
     return Promises.forEach(ite, f).exchange(Unit)
 }
 

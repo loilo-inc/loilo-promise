@@ -7,13 +7,13 @@ import java.util.concurrent.ExecutorService;
  */
 public interface Submittable {
 
-    Canceller submitOn(final ExecutorService executorService, final Object tag);
+    Canceller submitOn(ExecutorService executorService, Object tag);
 
 
-    Canceller submitOn(final ExecutorService executorService);
+    Canceller submitOn(ExecutorService executorService);
 
 
-    Canceller submit(final Object tag);
+    Canceller submit(Object tag);
 
 
     Canceller submit();

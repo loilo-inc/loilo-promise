@@ -16,11 +16,11 @@ import java.util.concurrent.TimeUnit;
 import tv.loilo.promise.Defer;
 import tv.loilo.promise.Deferred;
 import tv.loilo.promise.Dispatcher;
-import tv.loilo.promise.EntryFunction;
-import tv.loilo.promise.EntryParams;
 import tv.loilo.promise.Promise;
 import tv.loilo.promise.Promises;
 import tv.loilo.promise.Result;
+import tv.loilo.promise.WhenCallback;
+import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.support.PromiseLoader;
 import tv.loilo.promise.support.PromiseLoaderCallbacks;
 
@@ -72,9 +72,9 @@ public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment
             @NonNull
             @Override
             protected Promise<Void> onCreatePromise() throws Exception {
-                return Promises.when(new EntryFunction<Void>() {
+                return Promises.when(new WhenCallback<Void>() {
                     @Override
-                    public Deferred<Void> run(EntryParams params) throws Exception {
+                    public Deferred<Void> run(WhenParams params) throws Exception {
                         TimeUnit.SECONDS.sleep(10);
                         return Defer.success(null);
                     }

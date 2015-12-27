@@ -3,7 +3,7 @@ package tv.loilo.promise;
 /**
  * Created by Junpei on 2015/10/26.
  */
-public final class ResultParams<T> implements ExecutionContext {
+public class ResultParams<T> implements ExecutionContext {
 
     private final Result<T> mResult;
 
@@ -11,7 +11,7 @@ public final class ResultParams<T> implements ExecutionContext {
 
     private final Object mTag;
 
-    public ResultParams(final Result<T> result, final CloseableStack scope, final Object tag) {
+    public ResultParams(Result<T> result, CloseableStack scope, Object tag) {
         mResult = result;
         mScope = scope;
         mTag = tag;

@@ -45,9 +45,9 @@ public class PromisesTest extends InstrumentationTestCase {
 
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        Promises.when(new EntryFunction<String>() {
+        Promises.when(new WhenCallback<String>() {
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 return Defer.success("Hello");
             }
         }).succeeded(new SuccessCallback<String, String>() {
@@ -57,7 +57,7 @@ public class PromisesTest extends InstrumentationTestCase {
             }
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureSucceeded(args.asResult());
                 Log.i("PromisesTest", "testNormal " + args.getValue());
             }
@@ -71,9 +71,9 @@ public class PromisesTest extends InstrumentationTestCase {
 
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        Promises.when(new EntryFunction<String>() {
+        Promises.when(new WhenCallback<String>() {
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 TimeUnit.SECONDS.sleep(5);
                 return Defer.success("Hello");
             }
@@ -85,16 +85,16 @@ public class PromisesTest extends InstrumentationTestCase {
 
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureSucceeded(args.asResult());
                 Log.i("PromisesTest", "testCancellableWhenNotRunningFuture 1 " + args.getValue());
             }
         }).submitOn(executorService);
 
-        final Canceller canceller = Promises.when(new EntryFunction<String>() {
+        final Canceller canceller = Promises.when(new WhenCallback<String>() {
 
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 return Defer.success("Hello");
             }
         }).succeeded(new SuccessCallback<String, String>() {
@@ -105,7 +105,7 @@ public class PromisesTest extends InstrumentationTestCase {
             }
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureCanceled(args.asResult());
                 Log.i("PromisesTest", "testCancellableWhenNotRunningFuture 2");
             }
@@ -120,10 +120,10 @@ public class PromisesTest extends InstrumentationTestCase {
 
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        Promises.when(new EntryFunction<String>() {
+        Promises.when(new WhenCallback<String>() {
 
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 TimeUnit.SECONDS.sleep(10);
                 return Defer.success("Hello");
             }
@@ -135,7 +135,7 @@ public class PromisesTest extends InstrumentationTestCase {
             }
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureCanceled(args.asResult());
                 Log.i("PromisesTest", "testCancellableWhenSleep");
             }
@@ -149,10 +149,10 @@ public class PromisesTest extends InstrumentationTestCase {
 
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        Promises.when(new EntryFunction<String>() {
+        Promises.when(new WhenCallback<String>() {
 
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 return Defer.success("Hello");
             }
         }).succeeded(new SuccessCallback<String, String>() {
@@ -160,10 +160,10 @@ public class PromisesTest extends InstrumentationTestCase {
             @Override
             public Deferred<String> run(final SuccessParams<String> args) throws Exception {
                 //プロミスの中でプロミスを同期実行する
-                return Promises.when(new EntryFunction<String>() {
+                return Promises.when(new WhenCallback<String>() {
 
                     @Override
-                    public Deferred<String> run(EntryParams subArgs) throws Exception {
+                    public Deferred<String> run(WhenParams subArgs) throws Exception {
                         return Defer.success(args.getValue() + " Promise");
                     }
                 }).get(args);
@@ -171,7 +171,7 @@ public class PromisesTest extends InstrumentationTestCase {
 
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureSucceeded(args.asResult());
                 Log.i("PromisesTest", "testCallPromiseOverPromise " + args.getValue());
 
@@ -185,10 +185,10 @@ public class PromisesTest extends InstrumentationTestCase {
     public void testFail() throws Exception {
         final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        Promises.when(new EntryFunction<String>() {
+        Promises.when(new WhenCallback<String>() {
 
             @Override
-            public Deferred<String> run(EntryParams args) throws Exception {
+            public Deferred<String> run(WhenParams args) throws Exception {
                 throw new Exception("testFail");
             }
         }).succeeded(new SuccessCallback<String, String>() {
@@ -207,7 +207,7 @@ public class PromisesTest extends InstrumentationTestCase {
             }
         }).finish(new FinishCallback<String>() {
             @Override
-            public void run(ResultParams<String> args) {
+            public void run(FinishParams<String> args) {
                 ensureSucceeded(args.asResult());
                 Log.i("PromisesTest", "testCallPromiseOverPromise " + args.getValue());
             }

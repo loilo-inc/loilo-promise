@@ -12,7 +12,7 @@ Download
 
 TODO: Add more info.
 
-Lisence
+License
 -------
     Copyright 2015 LoiLo inc.
 

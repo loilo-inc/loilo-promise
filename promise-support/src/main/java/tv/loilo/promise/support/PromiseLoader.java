@@ -3,17 +3,16 @@ package tv.loilo.promise.support;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import tv.loilo.promise.Canceller;
 import tv.loilo.promise.Dispatcher;
 import tv.loilo.promise.FinishCallback;
+import tv.loilo.promise.FinishParams;
 import tv.loilo.promise.Promise;
 import tv.loilo.promise.Promises;
 import tv.loilo.promise.Result;
-import tv.loilo.promise.ResultParams;
 import tv.loilo.promise.Results;
 
 /**
@@ -109,7 +108,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
 
         mCanceller = getPromise().finish(new FinishCallback<TData>() {
             @Override
-            public void run(final ResultParams<TData> params) {
+            public void run(final FinishParams<TData> params) {
                 Dispatcher.getMainDispatcher().run(new Runnable() {
                     @Override
                     public void run() {

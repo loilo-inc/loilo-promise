@@ -7,15 +7,15 @@ public final class Defer {
     private Defer() {
     }
 
-    public static <T> Deferred<T> complete(final Result<T> result) {
+    public static <T> Deferred<T> complete(Result<T> result) {
         return new Completed<>(result);
     }
 
-    public static <T> Deferred<T> success(final T value) {
+    public static <T> Deferred<T> success(T value) {
         return new Completed<>(Results.success(value));
     }
 
-    public static <T> Deferred<T> fail(final Exception e) {
+    public static <T> Deferred<T> fail(Exception e) {
         return new Completed<>(Results.<T>fail(e));
     }
 
@@ -27,7 +27,7 @@ public final class Defer {
         return new Completed<>(Results.<T>notImpl());
     }
 
-    public static <TIn, TOut> Deferred<TOut> exchangeValue(final Result<TIn> result, TOut replace) {
+    public static <TIn, TOut> Deferred<TOut> exchangeValue(Result<TIn> result, TOut replace) {
         return new Completed<>(Results.exchangeValue(result, replace));
     }
 
@@ -35,7 +35,7 @@ public final class Defer {
 
         private final Result<T> mResult;
 
-        public Completed(final Result<T> result) {
+        public Completed(Result<T> result) {
             mResult = result;
         }
 

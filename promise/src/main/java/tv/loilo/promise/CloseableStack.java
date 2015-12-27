@@ -6,5 +6,5 @@ import java.io.Closeable;
  * Created by Junpei on 2015/06/16.
  */
 public interface CloseableStack {
-    <T extends Closeable> T push(final T closeable);
+    <T extends Closeable> T push(T closeable);
 }
