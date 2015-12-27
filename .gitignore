@@ -25,3 +25,11 @@ proguard/
 
 # Log Files
 *.log
+
+# Mac
+.DS_Store
+
+/.idea/*
+!/.idea/gradle.xml
+!/.idea/.name
+*.iml
