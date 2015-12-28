@@ -39,7 +39,7 @@ public final class Results {
     }
 
     public static <T> Result<T> notImpl() {
-        return new SimpleResult<>(false, null, new UnsupportedOperationException("Not implementation."), CancelTokens.NONE);
+        return new SimpleResult<>(false, null, new UnsupportedOperationException("Not implemented."), CancelTokens.NONE);
     }
 
     public static <TIn, TOut> Result<TOut> exchangeValue(Result<TIn> result, TOut replace) {
