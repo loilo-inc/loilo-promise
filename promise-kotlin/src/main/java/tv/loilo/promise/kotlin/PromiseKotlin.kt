@@ -42,8 +42,12 @@ fun <T> promiseRepeat(f: (RepeatParams) -> Deferred<T>): Repeat<T> {
     return Promises.repeat(f)
 }
 
-fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T>) -> Deferred<ForEachOp>): Promise<Unit> {
-    return Promises.forEach(ite, f).exchange(Unit)
+fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T, Unit>) -> Deferred<ForEachOp>): Promise<Unit> {
+    return Promises.forEach(ite, Unit, f)
+}
+
+fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachParams<TIn, TOut>) -> Deferred<ForEachOp>): Promise<TOut> {
+    return Promises.forEach(ite, operand, f)
 }
 
 fun <T> promiseSuccess(value: T): Promise<T> {

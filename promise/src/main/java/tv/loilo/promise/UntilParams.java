@@ -16,12 +16,21 @@
 
 package tv.loilo.promise;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by pepeotoito on 2015/12/27.
  */
 public class UntilParams<T> extends ResultParams<T> {
 
-    public UntilParams(Result<T> result, CloseableStack scope, Object tag) {
+    private final AtomicInteger mIndex;
+
+    public UntilParams(AtomicInteger index, Result<T> result, CloseableStack scope, Object tag) {
         super(result, scope, tag);
+        mIndex = index;
+    }
+
+    public AtomicInteger getIndex() {
+        return mIndex;
     }
 }

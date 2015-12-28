@@ -16,11 +16,26 @@
 
 package tv.loilo.promise;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by pepeotoito on 2015/12/27.
  */
-public class ForEachParams<T> extends SuccessParams<T> {
-    public ForEachParams(T value, CancelToken cancelToken, CloseableStack scope, Object tag) {
+public class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
+    private final AtomicInteger mIndex;
+    private final TOperand mOperand;
+
+    public ForEachParams(AtomicInteger index, TValue value, TOperand operand, CancelToken cancelToken, CloseableStack scope, Object tag) {
         super(value, cancelToken, scope, tag);
+        mIndex = index;
+        mOperand = operand;
+    }
+
+    public AtomicInteger getIndex() {
+        return mIndex;
+    }
+
+    public TOperand getOperand() {
+        return mOperand;
     }
 }

@@ -22,6 +22,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -88,6 +89,7 @@ public final class Promises {
                         final Detachable<ArrayCloseableStack> scope = new Detachable<>();
                         try {
                             Result<TOut> result;
+                            final AtomicInteger index = new AtomicInteger();
                             do {
                                 {
                                     final ArrayCloseableStack closing = scope.detach();
@@ -103,7 +105,7 @@ public final class Promises {
                                     deferred = Defer.cancel();
                                 } else {
                                     try {
-                                        deferred = callback.run(new RepeatParams(params.getCancelToken(), scope.ref(), params.getTag()));
+                                        deferred = callback.run(new RepeatParams(index, params.getCancelToken(), scope.ref(), params.getTag()));
                                     } catch (final InterruptedException e) {
                                         deferred = Defer.cancel();
                                         Thread.currentThread().interrupt();
@@ -117,7 +119,7 @@ public final class Promises {
                                 result = Results.exchangeCancelToken(deferred.getResult(), params.getCancelToken());
                             }
                             while (!result.getCancelToken().isCanceled()
-                                    && !untilCallback.run(new UntilParams<>(result, scope.ref(), params.getTag())));
+                                    && !untilCallback.run(new UntilParams<>(index, result, scope.ref(), params.getTag())));
 
                             params.getScope().push(scope.detach());
 
@@ -131,11 +133,12 @@ public final class Promises {
         };
     }
 
-    public static <TIn> Promise<Void> forEach(final Iterable<TIn> ite, final ForEachCallback<TIn> callback) {
-        return when(new WhenCallback<Void>() {
+    public static <TIn, TOut> Promise<TOut> forEach(final Iterable<TIn> ite, final TOut operand, final ForEachCallback<TIn, TOut> callback) {
+        return when(new WhenCallback<TOut>() {
 
             @Override
-            public Deferred<Void> run(WhenParams args) throws Exception {
+            public Deferred<TOut> run(WhenParams args) throws Exception {
+                final AtomicInteger index = new AtomicInteger();
                 for (TIn element : ite) {
                     if (args.getCancelToken().isCanceled()) {
                         return Defer.cancel();
@@ -143,17 +146,17 @@ public final class Promises {
 
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
-                        final Deferred<ForEachOp> result = callback.run(new ForEachParams<>(element, args.getCancelToken(), scope, args.getTag()));
+                        final Deferred<ForEachOp> result = callback.run(new ForEachParams<>(index, element, operand, args.getCancelToken(), scope, args.getTag()));
                         final ForEachOp next = result.getResult().safeGetValue();
                         if (next == ForEachOp.BREAK) {
-                            return Defer.success(null);
+                            return Defer.success(operand);
                         }
                     } finally {
                         scope.close();
                     }
                 }
 
-                return Defer.success(null);
+                return Defer.success(operand);
             }
         });
     }

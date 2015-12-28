@@ -16,11 +16,20 @@
 
 package tv.loilo.promise;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * Created by pepeotoito on 2015/12/27.
  */
 public class RepeatParams extends EntryParams {
-    public RepeatParams(CancelToken cancelToken, CloseableStack scope, Object tag) {
+    private final AtomicInteger mIndex;
+
+    public RepeatParams(AtomicInteger index, CancelToken cancelToken, CloseableStack scope, Object tag) {
         super(cancelToken, scope, tag);
+        mIndex = index;
+    }
+
+    public AtomicInteger getIndex() {
+        return mIndex;
     }
 }
