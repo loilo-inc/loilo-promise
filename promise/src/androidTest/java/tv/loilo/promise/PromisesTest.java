@@ -294,7 +294,7 @@ public class PromisesTest extends AndroidTestCase {
             }
         }).watch(new WatchCallback<String>() {
             @Override
-            public void run(ResultParams<String> params) throws Exception {
+            public void run(WatchParams<String> params) throws Exception {
                 if ("Hello Promise".equals(params.safeGetValue())) {
                     count.incrementAndGet();
                 }
@@ -326,7 +326,7 @@ public class PromisesTest extends AndroidTestCase {
         }).watch(new WatchCallback<String>() {
             @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
             @Override
-            public void run(ResultParams<String> params) throws Exception {
+            public void run(WatchParams<String> params) throws Exception {
                 if ("Hello Promise".equals(params.getException().getMessage())) {
                     count.incrementAndGet();
                 }
@@ -358,7 +358,7 @@ public class PromisesTest extends AndroidTestCase {
         }).watch(new WatchCallback<String>() {
             @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
             @Override
-            public void run(ResultParams<String> params) throws Exception {
+            public void run(WatchParams<String> params) throws Exception {
                 if (params.getCancelToken().isCanceled()) {
                     count.incrementAndGet();
                 }

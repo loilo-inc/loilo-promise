@@ -448,7 +448,7 @@ public final class Promises {
 
                 @Override
                 public Deferred<TOut> run(ThenParams<TOut> params) throws Exception {
-                    watchCallback.run(params);
+                    watchCallback.run(new WatchParams<>(params.asResult(), params.getScope(), params.getTag()));
                     return params.asDeferred();
                 }
             });
@@ -728,7 +728,7 @@ public final class Promises {
 
                 @Override
                 public Deferred<TOut> run(ThenParams<TOut> params) throws Exception {
-                    watchCallback.run(params);
+                    watchCallback.run(new WatchParams<>(params.asResult(), params.getScope(), params.getTag()));
                     return params.asDeferred();
                 }
             });
