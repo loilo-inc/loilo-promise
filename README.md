@@ -282,6 +282,7 @@ by Kotlin
             }
 
             d.setCancellable {
+                //Cancel thread.
                 thread.interrupt()
             }
 
