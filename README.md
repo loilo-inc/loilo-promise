@@ -230,7 +230,7 @@ by Java
                 }
             });
 
-            thread.run();
+            thread.start();
 
             return deferrable;
         }
@@ -286,7 +286,7 @@ by Kotlin
                 thread.interrupt()
             }
 
-            thread.run()
+            thread.start()
         }
     }.finish {
         it.whenSucceeded({
