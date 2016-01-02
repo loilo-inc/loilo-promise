@@ -26,9 +26,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by Junpei on 2015/06/16.
- */
 public class PromisesTest extends AndroidTestCase {
 
     public void testWhen() throws Exception {
@@ -629,5 +626,23 @@ public class PromisesTest extends AndroidTestCase {
         }).submit();
 
         assertEquals(1 + 2, deferrable.getResult().safeGetValue().get());
+    }
+
+    public void testExchange() throws Exception {
+        final Deferrable<String> deferrable = new Deferrable<>();
+
+        Promises.when(new WhenCallback<Integer>() {
+            @Override
+            public Deferred<Integer> run(WhenParams params) throws Exception {
+                return Defer.success(0);
+            }
+        }).exchange("Hello Promise").finish(new FinishCallback<String>() {
+            @Override
+            public void run(FinishParams<String> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submit();
+
+        assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 }

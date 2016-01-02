@@ -18,10 +18,6 @@ package tv.loilo.promise.kotlin
 
 import tv.loilo.promise.*
 
-/**
- * Created by pepeotoito on 2015/12/26.
- */
-
 fun runOnUi(process: () -> Unit) {
     Dispatcher.getMainDispatcher().run(process)
 }
