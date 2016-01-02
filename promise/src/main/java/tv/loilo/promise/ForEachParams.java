@@ -19,7 +19,7 @@ package tv.loilo.promise;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Parameters that are passed to {@link ForEachCallback}.
  */
 public class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
     private final AtomicInteger mIndex;

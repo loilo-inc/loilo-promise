@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/10/26.
+ * Parameters that are passed to the chained callback in {@link Promise}.
  */
 public class ResultParams<T> implements ExecutionContext {
 

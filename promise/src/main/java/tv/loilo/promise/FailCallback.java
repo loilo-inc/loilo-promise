@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Interface that will be invoked when {@link Promise} is failed.
  */
 public interface FailCallback<TOut> {
     Deferred<TOut> run(FailParams<TOut> params) throws Exception;

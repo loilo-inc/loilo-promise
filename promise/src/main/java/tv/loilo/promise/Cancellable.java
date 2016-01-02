@@ -17,8 +17,12 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Interface that performs the task cancellation.
  */
 public interface Cancellable {
+
+    /**
+     * Performs the task cancellation.
+     */
     void cancel();
 }

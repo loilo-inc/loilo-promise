@@ -19,7 +19,7 @@ package tv.loilo.promise;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Parameters that are passed to {@link RepeatCallback}.
  */
 public class RepeatParams extends EntryParams {
     private final AtomicInteger mIndex;

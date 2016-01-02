@@ -17,7 +17,8 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/12/17.
+ * Class for the data transfer.
+ * Uses in progress notification, etc.
  */
 public class Transfer<TData> implements TaggedCancelState {
 

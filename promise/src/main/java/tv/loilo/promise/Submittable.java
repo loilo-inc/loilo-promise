@@ -19,18 +19,39 @@ package tv.loilo.promise;
 import java.util.concurrent.ExecutorService;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Interface to submit a task for execution.
  */
 public interface Submittable {
 
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     *
+     * @param executorService the executor to submit this task
+     * @param tag             the tag associated with this execution (the tag can access from callback parameters)
+     * @return submitted task cancellation handle
+     */
     Canceller submitOn(ExecutorService executorService, Object tag);
 
 
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     * @param executorService the executor to submit this task
+     * @return submitted task cancellation handle
+     */
     Canceller submitOn(ExecutorService executorService);
 
-
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     * The task will running on default ExecutorService.
+     * @param tag the tag associated with this execution (the tag can access from callback parameters)
+     * @return submitted task cancellation handle
+     */
     Canceller submit(Object tag);
 
-
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     * The task will running on default ExecutorService.
+     * @return submitted task cancellation handle
+     */
     Canceller submit();
 }

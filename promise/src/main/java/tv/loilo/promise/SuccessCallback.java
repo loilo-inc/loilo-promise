@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Interface that will be invoked when {@link Promise} is succeeded.
  */
 public interface SuccessCallback<TIn, TOut> {
 

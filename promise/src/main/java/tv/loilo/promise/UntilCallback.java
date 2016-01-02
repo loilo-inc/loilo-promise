@@ -17,8 +17,15 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/09/11.
+ * Interface to determine whether repeated continue or end.
  */
 public interface UntilCallback<TIn> {
+    /**
+     * Determine whether repeated continue or end.
+     *
+     * @param params
+     * @return {@code true} if you want to stop repeat and {@code false} if you want to continue repeat.
+     * @throws Exception
+     */
     boolean run(UntilParams<TIn> params) throws Exception;
 }

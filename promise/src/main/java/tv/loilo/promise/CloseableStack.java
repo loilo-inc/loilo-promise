@@ -19,7 +19,7 @@ package tv.loilo.promise;
 import java.io.Closeable;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Interface for registering object that discard after the completion of the execution.
  */
 public interface CloseableStack {
     <T extends Closeable> T push(T closeable);

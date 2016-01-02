@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Interface that will be repeatedly invoked, when {@link Promise} is executed, until the stop by {@link UntilCallback}.
  */
 public interface RepeatCallback<TOut> {
     Deferred<TOut> run(RepeatParams params) throws Exception;

@@ -17,8 +17,14 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/12.
+ * Interface that represents the cancellation state.
  */
 public interface CancelToken {
+
+    /**
+     * Returns {@code true} if the task is canceled or {@code false} if the task is not canceled.
+     *
+     * @return {@code true} if the task is canceled or {@code false} if the task is not canceled
+     */
     boolean isCanceled();
 }

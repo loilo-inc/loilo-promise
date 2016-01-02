@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Class to be able to synchronously get the result of asynchronous processing.
  */
 public final class Deferrable<T> implements Deferred<T> {
 

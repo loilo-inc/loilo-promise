@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/09/11.
+ * Interface that sets repeated conditions and creates {@link Promise}.
  */
 public interface Repeat<TOut> {
     Promise<TOut> until(UntilCallback<TOut> untilCallback);

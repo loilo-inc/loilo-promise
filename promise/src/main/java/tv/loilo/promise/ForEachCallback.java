@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Interface that will be invoked on each element in the enumeration.
  */
 public interface ForEachCallback<TIn, TOperand> {
     Deferred<ForEachOp> run(ForEachParams<TIn, TOperand> params) throws Exception;

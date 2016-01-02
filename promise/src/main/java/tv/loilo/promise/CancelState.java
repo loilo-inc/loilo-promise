@@ -17,8 +17,14 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/08/21.
+ * Interface that provides the cancellation state.
  */
 public interface CancelState {
+
+    /**
+     * Returns the cancellation state
+     *
+     * @return the cancellation state
+     */
     CancelToken getCancelToken();
 }

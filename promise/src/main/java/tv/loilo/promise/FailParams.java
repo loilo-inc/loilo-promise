@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/10/26.
+ * Parameters that are passed to {@link FailCallback}.
  */
 public class FailParams<T> implements ExecutionContext {
     private final Exception mException;

@@ -24,7 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by Junpei on 2015/10/26.
+ * Class for transferring the data only once between different threads.
  */
 public final class Pipe<T> {
     private final BlockingQueue<T> mQueue;

@@ -26,16 +26,36 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-//Javaの仕様でSleepやLock等のブロック処理を抜ける仕組みがThread.interruptしかない。
-// Threadの割り込み処理によるキャンセル処理をうまくフレームワーク化したいので作っているライブラリになります。
+/**
+ * This class is {@link tv.loilo.promise.Promise Promise} Factory.
+ */
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
 public final class Promises {
     private static final ExecutorService mDefaultExecutorService = Executors.newCachedThreadPool();
 
+    /**
+     * Promise to return a result of the callback.
+     * The callback will be execute asynchronously on background thread.
+     * Promise will be executing when you called a method to submit.
+     * <p/>
+     * If Promise is canceled before the callback execution,
+     * this callback call is skipped, and calls the subsequent callback.
+     *
+     * @param whenCallback the callback when Promise submitted
+     * @param <TOut>       the type of the callback result value
+     * @return promise to return a result
+     */
     public static <TOut> Promise<TOut> when(WhenCallback<TOut> whenCallback) {
         return new InitialPromise<>(whenCallback);
     }
 
+    /**
+     * Promise to return a value.
+     *
+     * @param out the output value
+     * @param <TOut> the type of the output value
+     * @return promise to return a output value
+     */
     public static <TOut> Promise<TOut> success(final TOut out) {
         return when(new WhenCallback<TOut>() {
 
@@ -46,6 +66,13 @@ public final class Promises {
         });
     }
 
+    /**
+     * Promise to fail by exception.
+     *
+     * @param e the exception of failure cause
+     * @param <TOut> the type of the output value if Promise were to success
+     * @return promise to return a failure result
+     */
     public static <TOut> Promise<TOut> fail(final Exception e) {
         return when(new WhenCallback<TOut>() {
 
@@ -56,6 +83,12 @@ public final class Promises {
         });
     }
 
+    /**
+     * Promise to cancel.
+     *
+     * @param <TOut> the type of the output value if Promise were to success
+     * @return promise to return a canceled result
+     */
     public static <TOut> Promise<TOut> cancel() {
         return when(new WhenCallback<TOut>() {
 
@@ -66,6 +99,11 @@ public final class Promises {
         });
     }
 
+    /**
+     * Promise to fail by exception that means not implemented.
+     * @param <TOut> the type of the output value if Promise were to success
+     * @return promise to return a failure result
+     */
     public static <TOut> Promise<TOut> notImpl() {
         return when(new WhenCallback<TOut>() {
 
@@ -76,6 +114,13 @@ public final class Promises {
         });
     }
 
+    /**
+     * Promise to repeat executing the callback.
+     *
+     * @param callback the callback to repeat
+     * @param <TOut> the type of the callback result value
+     * @return the object that sets repeated conditions
+     */
     public static <TOut> Repeat<TOut> repeat(final RepeatCallback<TOut> callback) {
         return new Repeat<TOut>() {
 
@@ -133,6 +178,16 @@ public final class Promises {
         };
     }
 
+    /**
+     * Promise to enumerate the members of the collection and to perform the given callback on each element.
+     *
+     * @param ite the collection of enumeration target
+     * @param operand the value that will be passed to the callback and will be a result of promise
+     * @param callback the callback on each element.
+     * @param <TIn> the type of element
+     * @param <TOut> the type of operand
+     * @return promise to return the operand value
+     */
     public static <TIn, TOut> Promise<TOut> forEach(final Iterable<TIn> ite, final TOut operand, final ForEachCallback<TIn, TOut> callback) {
         return when(new WhenCallback<TOut>() {
 
@@ -191,7 +246,6 @@ public final class Promises {
 
         return Defer.success(params.getValue());
     }
-
 
     private interface EntryPoint extends Submittable {
         void execute(final CancelToken cancelToken, final CloseableStack scope, final Object tag);
@@ -783,5 +837,8 @@ public final class Promises {
                 }
             });
         }
+    }
+
+    private Promises() {
     }
 }

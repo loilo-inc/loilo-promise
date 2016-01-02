@@ -23,7 +23,7 @@ import java.util.ArrayDeque;
 import java.util.Iterator;
 
 /**
- * Created by Junpei on 2015/06/16.
+ * Implementation of {@link CloseableStack} by ArrayDeque.
  */
 public final class ArrayCloseableStack implements CloseableStack, Closeable {
     private final ArrayDeque<Closeable> mDeque;

@@ -19,7 +19,7 @@ package tv.loilo.promise;
 import java.util.concurrent.CancellationException;
 
 /**
- * Created by Junpei on 2015/06/12.
+ * Class to make a {@link Result}.
  */
 public final class Results {
     private Results() {

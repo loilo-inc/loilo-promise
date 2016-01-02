@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/10/26.
+ * Parameters that are passed to the first callback in {@link Promise}.
  */
 public class EntryParams implements ExecutionContext {
     private final CancelToken mCancelToken;

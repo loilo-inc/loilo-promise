@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Parameters that are passed to {@link WatchCallback}.
  */
 public class WatchParams<TOut> extends ResultParams<TOut> {
     public WatchParams(Result<TOut> result, CloseableStack scope, Object tag) {

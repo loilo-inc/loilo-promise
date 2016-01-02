@@ -17,15 +17,43 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/12.
+ * Result of asynchronous processing.
+ * The result will take one of the states of the success or failure or canceled.
+ *
+ * Access in the followings order.
+ * 1. {@link Result#getCancelToken() getCancelToken()}
+ * 2. {@link Result#getException() getException()}
+ * 3. {@link Result#getValue() getValue()}
  */
 public interface Result<T> extends CancelState {
 
+    /**
+     * Returns the course of the task failure or {@code null} if the task is not failed.
+     *
+     * @return the course of the task failure or {@code null} if the task is not failed
+     */
     Exception getException();
 
+    /**
+     * Returns {@code true} if the value is set or {@code false} if the value is not set.
+     *
+     * @return {@code true} if the value is set or {@code false} if the value is not set
+     */
     boolean hasValue();
 
+    /**
+     * Returns the value if the task is succeeded or {@code null} if the task is not succeeded or the value is set {@code null}.
+     *
+     * @return the value if the task is succeeded or {@code null} if the task is not succeeded or the value is set {@code null}
+     */
     T getValue();
 
+    /**
+     * Returns the value if the task is succeeded or throws exception otherwise.
+     *
+     * @return the value if the task is succeeded
+     * @throws java.util.concurrent.CancellationException the task is canceled
+     * @throws java.lang.Exception                        the cause of the task failure
+     */
     T safeGetValue() throws Exception;
 }

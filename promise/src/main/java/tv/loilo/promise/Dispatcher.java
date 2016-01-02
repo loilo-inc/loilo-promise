@@ -24,7 +24,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Created by Junpei on 2015/10/07.
+ * Android {@link android.os.Handler Handler} wrapper.
  */
 public final class Dispatcher {
 

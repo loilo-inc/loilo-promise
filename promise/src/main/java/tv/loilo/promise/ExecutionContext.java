@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/08/21.
+ * Interface to hold the executing states and to provide it.
  */
 public interface ExecutionContext extends TaggedCancelState {
     CloseableStack getScope();

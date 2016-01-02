@@ -20,7 +20,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * Created by Junpei on 2015/09/17.
+ * Class to switch to close the object or not close.
  */
 public final class Detachable<TRef extends Closeable> implements Closeable {
 

@@ -19,7 +19,7 @@ package tv.loilo.promise;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Created by pepeotoito on 2015/12/27.
+ * Parameters that are passed to {@link UntilCallback}.
  */
 public class UntilParams<T> extends ResultParams<T> {
 

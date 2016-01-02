@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/06/12.
+ * Interface that will be first invoked, after {@link Promise} has started.
  */
 public interface WhenCallback<TOut> {
     Deferred<TOut> run(WhenParams params) throws Exception;

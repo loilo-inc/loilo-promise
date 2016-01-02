@@ -17,7 +17,7 @@
 package tv.loilo.promise;
 
 /**
- * Created by Junpei on 2015/12/21.
+ * Interface that will be invoked when {@link Promise} is completed.
  */
 public interface WatchCallback<T> {
     void run(WatchParams<T> params) throws Exception;
