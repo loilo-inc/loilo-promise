@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright 2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,14 @@
  * limitations under the License.
  */
 
-include ':promise', ':promise-kotlin', ':promise-support', ':promise-samples-progress', ':promise-support-kotlin', ':promise-samples-progress-kotlin', ':promise-samples-errorhandling'
+package tv.loilo.promise;
+
+/**
+ * Thrown when an exception is unhandled.
+ */
+public final class UnhandledException extends RuntimeException {
+
+    public UnhandledException(String detailMessage, Throwable throwable) {
+        super(detailMessage, throwable);
+    }
+}

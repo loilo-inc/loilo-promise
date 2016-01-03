@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright 2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,4 +14,16 @@
  * limitations under the License.
  */
 
-include ':promise', ':promise-kotlin', ':promise-support', ':promise-samples-progress', ':promise-support-kotlin', ':promise-samples-progress-kotlin', ':promise-samples-errorhandling'
+package tv.loilo.promise.samples.errorhandling;
+
+import android.app.Application;
+import android.test.ApplicationTestCase;
+
+/**
+ * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
+ */
+public class ApplicationTest extends ApplicationTestCase<Application> {
+    public ApplicationTest() {
+        super(Application.class);
+    }
+}

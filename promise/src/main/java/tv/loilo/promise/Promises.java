@@ -33,6 +33,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class Promises {
     private static final ExecutorService mDefaultExecutorService = Executors.newCachedThreadPool();
 
+    private Promises() {
+    }
+
     /**
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
@@ -52,7 +55,7 @@ public final class Promises {
     /**
      * Promise to return a value.
      *
-     * @param out the output value
+     * @param out    the output value
      * @param <TOut> the type of the output value
      * @return promise to return a output value
      */
@@ -69,7 +72,7 @@ public final class Promises {
     /**
      * Promise to fail by exception.
      *
-     * @param e the exception of failure cause
+     * @param e      the exception of failure cause
      * @param <TOut> the type of the output value if Promise were to success
      * @return promise to return a failure result
      */
@@ -101,6 +104,7 @@ public final class Promises {
 
     /**
      * Promise to fail by exception that means not implemented.
+     *
      * @param <TOut> the type of the output value if Promise were to success
      * @return promise to return a failure result
      */
@@ -118,7 +122,7 @@ public final class Promises {
      * Promise to repeat executing the callback.
      *
      * @param callback the callback to repeat
-     * @param <TOut> the type of the callback result value
+     * @param <TOut>   the type of the callback result value
      * @return the object that sets repeated conditions
      */
     public static <TOut> Repeat<TOut> repeat(final RepeatCallback<TOut> callback) {
@@ -181,11 +185,11 @@ public final class Promises {
     /**
      * Promise to enumerate the members of the collection and to perform the given callback on each element.
      *
-     * @param ite the collection of enumeration target
-     * @param operand the value that will be passed to the callback and will be a result of promise
+     * @param ite      the collection of enumeration target
+     * @param operand  the value that will be passed to the callback and will be a result of promise
      * @param callback the callback on each element.
-     * @param <TIn> the type of element
-     * @param <TOut> the type of operand
+     * @param <TIn>    the type of element
+     * @param <TOut>   the type of operand
      * @return promise to return the operand value
      */
     public static <TIn, TOut> Promise<TOut> forEach(final Iterable<TIn> ite, final TOut operand, final ForEachCallback<TIn, TOut> callback) {
@@ -352,24 +356,20 @@ public final class Promises {
             mFinishCallback = finishCallback;
         }
 
-
         @Override
         public Canceller submitOn(final ExecutorService executorService, final Object tag) {
             return mEntryPoint.submitOn(executorService, tag);
         }
-
 
         @Override
         public Canceller submitOn(ExecutorService executorService) {
             return submitOn(executorService, null);
         }
 
-
         @Override
         public Canceller submit(Object tag) {
             return submitOn(mDefaultExecutorService, tag);
         }
-
 
         @Override
         public Canceller submit() {
@@ -416,9 +416,16 @@ public final class Promises {
 
             if (mNextPoint != null) {
                 mNextPoint.execute(output, cancelToken, scope, tag);
+            } else {
+                if (output.getCancelToken().isCanceled()) {
+                    return;
+                }
+                final Exception e = output.getException();
+                if (e != null) {
+                    throw new UnhandledException("Unhandled exception occurred.", e);
+                }
             }
         }
-
 
         @Override
         public Deferred<TOut> get(TaggedCancelState state) {
@@ -433,7 +440,6 @@ public final class Promises {
                 scope.close();
             }
         }
-
 
         @Override
         public Deferred<TOut> getOn(ExecutorService executorService, Tagged state) {
@@ -451,7 +457,6 @@ public final class Promises {
             return deferred;
         }
 
-
         @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
             return when(new WhenCallback<TOut>() {
@@ -463,30 +468,25 @@ public final class Promises {
             });
         }
 
-
         @Override
         public Canceller submitOn(final ExecutorService executorService, final Object tag) {
             return mEntryPoint.submitOn(executorService, tag);
         }
-
 
         @Override
         public Canceller submitOn(ExecutorService executorService) {
             return submitOn(executorService, null);
         }
 
-
         @Override
         public Canceller submit(Object tag) {
             return submitOn(mDefaultExecutorService, tag);
         }
 
-
         @Override
         public Canceller submit() {
             return submitOn(mDefaultExecutorService);
         }
-
 
         @Override
         public <TNextOut> Promise<TNextOut> then(ThenCallback<TOut, TNextOut> thenCallback) {
@@ -494,7 +494,6 @@ public final class Promises {
             setNextPoint(continuationTask);
             return continuationTask;
         }
-
 
         @Override
         public Promise<TOut> watch(final WatchCallback<TOut> watchCallback) {
@@ -510,7 +509,6 @@ public final class Promises {
             return continuationTask;
         }
 
-
         @Override
         public <TNextOut> Promise<TNextOut> succeeded(final SuccessCallback<TOut, TNextOut> successCallback) {
             final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, new ThenCallback<TOut, TNextOut>() {
@@ -523,7 +521,6 @@ public final class Promises {
             setNextPoint(continuationTask);
             return continuationTask;
         }
-
 
         @Override
         public Promise<TOut> failed(final FailCallback<TOut> failCallback) {
@@ -538,14 +535,12 @@ public final class Promises {
             return continuationTask;
         }
 
-
         @Override
         public Submittable finish(FinishCallback<TOut> finishCallback) {
             final LastPromise<TOut> last = new LastPromise<>(mEntryPoint, finishCallback);
             setNextPoint(last);
             return last;
         }
-
 
         @Override
         public <TReplace> Promise<TReplace> exchange(final TReplace replace) {
@@ -596,9 +591,17 @@ public final class Promises {
 
             if (mNextPoint != null) {
                 mNextPoint.execute(result, cancelToken, scope, tag);
+            } else {
+                if (result.getCancelToken().isCanceled()) {
+                    return;
+                }
+
+                final Exception e = result.getException();
+                if (e != null) {
+                    throw new UnhandledException("Promise unhandled exception occurred.", e);
+                }
             }
         }
-
 
         @Override
         public Deferred<TOut> get(TaggedCancelState state) {
@@ -613,7 +616,6 @@ public final class Promises {
                 scope.close();
             }
         }
-
 
         @Override
         public Deferred<TOut> getOn(ExecutorService executorService, Tagged state) {
@@ -632,7 +634,6 @@ public final class Promises {
             return deferred;
         }
 
-
         @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
             return when(new WhenCallback<TOut>() {
@@ -644,7 +645,6 @@ public final class Promises {
             });
         }
 
-
         @Override
         public Canceller submitOn(final ExecutorService executorService, final Object tag) {
             //ここがPromiseのエントリーポイントになります。他のPromiseのインスタンスも結局これを呼び出しています。
@@ -655,7 +655,7 @@ public final class Promises {
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
                         execute(CancelTokens.CANCELED, scope, tag);
-                    } catch (final Exception e) {
+                    } catch (final RuntimeException e) {
                         hasCriticalError = true;
                         Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
                         Dispatcher.getMainDispatcher().run(new Runnable() {
@@ -706,7 +706,7 @@ public final class Promises {
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
                         execute(canceller, scope, tag);
-                    } catch (final Exception e) {
+                    } catch (final RuntimeException e) {
                         hasCriticalError = true;
                         Log.e("loilo-promise", "InitialPromise: Promise exception occurred.", e);
                         Dispatcher.getMainDispatcher().run(new Runnable() {
@@ -755,18 +755,15 @@ public final class Promises {
             return submitOn(executorService, null);
         }
 
-
         @Override
         public Canceller submit(Object tag) {
             return submitOn(mDefaultExecutorService, tag);
         }
 
-
         @Override
         public Canceller submit() {
             return submitOn(mDefaultExecutorService);
         }
-
 
         @Override
         public <TNextOut> Promise<TNextOut> then(final ThenCallback<TOut, TNextOut> thenCallback) {
@@ -774,7 +771,6 @@ public final class Promises {
             setNextPoint(continuationTask);
             return continuationTask;
         }
-
 
         @Override
         public Promise<TOut> watch(final WatchCallback<TOut> watchCallback) {
@@ -790,7 +786,6 @@ public final class Promises {
             return continuationTask;
         }
 
-
         @Override
         public <TNextOut> Promise<TNextOut> succeeded(final SuccessCallback<TOut, TNextOut> successCallback) {
             final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(this, new ThenCallback<TOut, TNextOut>() {
@@ -803,7 +798,6 @@ public final class Promises {
             setNextPoint(continuationTask);
             return continuationTask;
         }
-
 
         @Override
         public Promise<TOut> failed(final FailCallback<TOut> failCallback) {
@@ -818,14 +812,12 @@ public final class Promises {
             return continuationTask;
         }
 
-
         @Override
         public Submittable finish(final FinishCallback<TOut> finishCallback) {
             final LastPromise<TOut> last = new LastPromise<>(this, finishCallback);
             setNextPoint(last);
             return last;
         }
-
 
         @Override
         public <TReplace> Promise<TReplace> exchange(final TReplace replace) {
@@ -837,8 +829,5 @@ public final class Promises {
                 }
             });
         }
-    }
-
-    private Promises() {
     }
 }
