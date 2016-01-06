@@ -24,7 +24,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Android {@link android.os.Handler Handler} wrapper.
+ * The android.os.Handler wrapper class.
  */
 public final class Dispatcher {
 
@@ -38,7 +38,7 @@ public final class Dispatcher {
     public static Dispatcher getMainDispatcher() {
         Dispatcher dispatcher = mMainDispatcher;
         if (dispatcher == null) {
-            //ダブルチェックロッキング
+            //Double check locking.
             synchronized (Dispatcher.class) {
                 if (mMainDispatcher == null) {
                     mMainDispatcher = new Dispatcher(Looper.getMainLooper());
@@ -83,7 +83,7 @@ public final class Dispatcher {
                     return;
                 }
                 try {
-                    //この中に入るとcanceledフラグではもうキャンセルできない
+                    //The callable can not cancel by the canceled flag.
                     final T result = callable.call();
                     deferrable.setSucceeded(result);
                 } catch (final CancellationException e) {

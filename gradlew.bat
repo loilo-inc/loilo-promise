@@ -9,6 +9,7 @@
 if "%OS%"=="Windows_NT" setlocal
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+@rem set DEFAULT_JVM_OPTS=-Dfile.encoding=UTF-8
 set DEFAULT_JVM_OPTS=
 
 set DIRNAME=%~dp0

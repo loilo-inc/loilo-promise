@@ -32,7 +32,9 @@ import tv.loilo.promise.Result;
 import tv.loilo.promise.Results;
 
 /**
- * Created by pepeotoito on 2015/12/26.
+ * Base class for android.support.v4.content.Loader for using tv.loilo.promise.Promise.
+ *
+ * @param <TData> the specified type of a success value
  */
 public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
 
@@ -44,16 +46,6 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     @Nullable
     private TData mDataCache;
 
-    /**
-     * Stores away the application context associated with context.
-     * Since Loaders can be used across multiple activities it's dangerous to
-     * store the context directly; always use {@link #getContext()} to retrieve
-     * the Loader's Context, don't use the constructor argument directly.
-     * The Context returned by {@link #getContext} is safe to use across
-     * Activity instances.
-     *
-     * @param context used to retrieve the application context.
-     */
     public PromiseLoader(Context context) {
         super(context);
     }
