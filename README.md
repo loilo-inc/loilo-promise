@@ -4,9 +4,24 @@ A simple promise library for Android.
 
 The library can work with java and kotlin.
 
+The purpose and use of this library is the following.
+
+* Avoiding the callback hell on asynchronous operations.
+* Propagating the exception, which occurred in the callback, to the next callback.
+* Canceling the asynchronous operation immediately, even if you had used blocking API, such as the `java.lang.Thread#sleep()`. And detecting canceled.
+
 ## Download
 
-Coming Soon.
+loilo-promise is available on Marven Central.
+
+via Gradle
+
+```groovy
+dependencies {
+    compile 'tv.loilo.promise:promise:0.1.1'
+    compile 'tv.loilo.promise:promise-support:0.1.1'
+}
+```
 
 ## with Kotlin
 
@@ -359,7 +374,7 @@ by Kotlin
         }.submit()
 ```
 
-### Iterate Parameters and Asynchronous Calls
+### Enumerate Parameters and Asynchronous Calls
 
 by Java
 ```java
@@ -486,7 +501,7 @@ by Kotlin
     }.submit()
 ```
 
-> If you call any blocking API at main(UI) thread,
+> If you call any blocking API on main(UI) thread,
 `Dispatcher.call()` has a risk of deadlock.
 
 ## Run on Your ExecutorService
@@ -537,7 +552,7 @@ by Kotlin
 ## Android Loader Implementation
 
 Promise has implementation of `android.support.v4.content.Loader`.
-You can use it like Android `AsyncTaskLoader` class.
+You can use it as the Android `AsyncTaskLoader` class.
 
 See the following sample code.
 
