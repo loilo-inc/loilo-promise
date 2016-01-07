@@ -24,10 +24,6 @@ import tv.loilo.promise.support.ProgressPromiseLoader
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks
 import tv.loilo.promise.support.PromiseLoader
 
-/**
- * Created by pepeotoito on 2015/12/27.
- */
-
 fun LoaderManager.cancelLoader(id: Int) {
     PromiseLoader.cancelLoader(this, id)
 }
