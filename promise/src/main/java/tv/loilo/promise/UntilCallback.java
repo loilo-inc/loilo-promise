@@ -23,9 +23,9 @@ public interface UntilCallback<TIn> {
     /**
      * Determine whether repeated continue or end.
      *
-     * @param params
-     * @return {@code true} if you want to stop repeat and {@code false} if you want to continue repeat.
-     * @throws Exception
+     * @param params the parameters contains the result of the previous {@link RepeatCallback}
+     * @return {@code true} if you want to stop repeat and {@code false} if you want to continue repeat
+     * @throws Exception any
      */
     boolean run(UntilParams<TIn> params) throws Exception;
 }

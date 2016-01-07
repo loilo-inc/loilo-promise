@@ -22,7 +22,11 @@ import android.support.v4.app.Fragment;
 import tv.loilo.promise.Promise;
 
 /**
- * Created by pepeotoito on 2015/12/26.
+ * Interface for the creation of tv.loilo.promise.Promise.
+ *
+ * @param <TFragment> the specified type of a implementation of {@link ProgressPromiseLoaderCallbacks}
+ * @param <TData>     the specified type of a success value
+ * @param <TProgress> the specified type of progress value
  */
 public interface ProgressPromiseFactory<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress> {
     @NonNull

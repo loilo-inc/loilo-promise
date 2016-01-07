@@ -35,7 +35,7 @@ public interface Promise<TOut> extends Submittable {
     Deferred<TOut> get(TaggedCancelState state);
 
     /**
-     * Executes this promise on a specified {@link java.util.concurrent.ExecutorService} and returns a deferred result value.
+     * Executes this promise on a specified java.util.concurrent.ExecutorService and returns a deferred result value.
      * Use this when you want to execute a Promise on any Promises callbacks.
      *
      * @param executorService to submit a task for promise execution

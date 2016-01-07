@@ -27,7 +27,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * This class is {@link tv.loilo.promise.Promise Promise} Factory.
+ * This class is {@link Promise} Factory.
  */
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
 public final class Promises {
@@ -40,7 +40,7 @@ public final class Promises {
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
      * Promise will be executing when you called a method to submit.
-     * <p/>
+     *
      * If Promise is canceled before the callback execution,
      * this callback call is skipped, and calls the subsequent callback.
      *
@@ -292,7 +292,7 @@ public final class Promises {
                 mLock.unlock();
             }
 
-            //実行前にキャンセルしたら、デフォルトのスレッドからキャンセルコールバックする。
+            //If Promise was canceled before the execution, invoke the callback on the default thread.
             mDefaultExecutorService.execute(mCancelCallback);
         }
 
@@ -400,7 +400,6 @@ public final class Promises {
         @Override
         public void execute(final Result<TIn> input, final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
             Deferred<TOut> deferred;
-            //ここはキャンセルしてても必ずコールバックを呼ぶようにしています。
             try {
                 deferred = mThenCallback.run(new ThenParams<>(input, scope, tag));
             } catch (final InterruptedException e) {
@@ -571,7 +570,7 @@ public final class Promises {
         public void execute(final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
 
             Deferred<TOut> handle;
-            //キャンセルされていたら最初のFunctionは呼び出しません。
+            //Do not call the initial callback when Promise was already canceled.
             if (cancelToken.isCanceled()) {
                 handle = Defer.cancel();
             } else {
@@ -647,7 +646,8 @@ public final class Promises {
 
         @Override
         public Canceller submitOn(final ExecutorService executorService, final Object tag) {
-            //ここがPromiseのエントリーポイントになります。他のPromiseのインスタンスも結局これを呼び出しています。
+            //This method is the entry point of Promise. All of the instances of other Promise eventually call this.
+
             final FutureCanceller canceller = new FutureCanceller(new Runnable() {
                 @Override
                 public void run() {
@@ -661,7 +661,7 @@ public final class Promises {
                         Dispatcher.getMainDispatcher().run(new Runnable() {
                             @Override
                             public void run() {
-                                //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                //Throw on main thread to crash the application.
                                 throw e;
                             }
                         });
@@ -671,7 +671,7 @@ public final class Promises {
                         Dispatcher.getMainDispatcher().run(new Runnable() {
                             @Override
                             public void run() {
-                                //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                //Throw on main thread to crash the application.
                                 throw e;
                             }
                         });
@@ -685,7 +685,7 @@ public final class Promises {
                                 Dispatcher.getMainDispatcher().run(new Runnable() {
                                     @Override
                                     public void run() {
-                                        //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                        //Throw on main thread to crash the application.
                                         throw e;
                                     }
                                 });
@@ -712,7 +712,7 @@ public final class Promises {
                         Dispatcher.getMainDispatcher().run(new Runnable() {
                             @Override
                             public void run() {
-                                //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                //Throw on main thread to crash the application.
                                 throw e;
                             }
                         });
@@ -722,7 +722,7 @@ public final class Promises {
                         Dispatcher.getMainDispatcher().run(new Runnable() {
                             @Override
                             public void run() {
-                                //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                //Throw on main thread to crash the application.
                                 throw e;
                             }
                         });
@@ -736,7 +736,7 @@ public final class Promises {
                                 Dispatcher.getMainDispatcher().run(new Runnable() {
                                     @Override
                                     public void run() {
-                                        //メインスレッドで例外を飛ばす。これでアプリを終了させる。
+                                        //Throw on main thread to crash the application.
                                         throw e;
                                     }
                                 });

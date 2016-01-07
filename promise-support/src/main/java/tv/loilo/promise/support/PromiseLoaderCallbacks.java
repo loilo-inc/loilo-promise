@@ -21,7 +21,9 @@ import android.support.v4.app.LoaderManager;
 import tv.loilo.promise.Result;
 
 /**
- * Created by pepeotoito on 2015/12/26.
+ * Extends android.support.v4.app.LoaderManager.LoaderCallbacks for {@link PromiseLoader}.
+ *
+ * @param <TData> the specified type of a success value
  */
 public interface PromiseLoaderCallbacks<TData> extends LoaderManager.LoaderCallbacks<Result<TData>> {
 }

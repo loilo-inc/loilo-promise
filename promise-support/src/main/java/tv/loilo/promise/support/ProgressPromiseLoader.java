@@ -27,7 +27,11 @@ import tv.loilo.promise.Result;
 import tv.loilo.promise.Transfer;
 
 /**
- * Created by pepeotoito on 2015/12/26.
+ * Base class for android.support.v4.content.Loader for using tv.loilo.promise.Promise with the progress notification.
+ *
+ * @param <TFragment> the specified type of a implementation of {@link ProgressPromiseLoaderCallbacks}
+ * @param <TData>     the specified type of a success value
+ * @param <TProgress> the specified type of progress value
  */
 public abstract class ProgressPromiseLoader<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
         extends PromiseLoader<TData> {

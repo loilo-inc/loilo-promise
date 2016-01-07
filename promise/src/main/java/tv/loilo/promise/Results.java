@@ -55,14 +55,13 @@ public final class Results {
 
     public static <T> Result<T> exchangeCancelToken(Result<T> result, CancelToken cancelToken) {
         if (result.getCancelToken().isCanceled()) {
-            //キャンセル済みだったらそのまま返していい。
             return result;
         }
 
         final boolean hasValue = result.hasValue();
         final T value = result.getValue();
         final Exception error = result.getException();
-        //cancellationStateを入れ替え
+        //Exchanges cancellationState.
         return new SimpleResult<>(hasValue, value, error, cancelToken);
     }
 
