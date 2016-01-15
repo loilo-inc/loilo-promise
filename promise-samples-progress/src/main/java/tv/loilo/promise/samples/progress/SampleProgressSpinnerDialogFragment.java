@@ -106,9 +106,9 @@ public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment
             @Override
             public void run() {
                 if (isResumed()) {
-                    final OnFinishedListener listener = resolveListener();
-
                     dismiss();
+
+                    final OnFinishedListener listener = resolveListener();
 
                     if (listener != null) {
                         if (data.getCancelToken().isCanceled()) {
