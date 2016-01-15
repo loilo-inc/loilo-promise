@@ -78,16 +78,15 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment(), PromiseLo
     override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>) {
         postOnUi {
             if (isResumed) {
-                val listener = resolveListener<OnFinishedListener>()
+
                 dismiss()
-                if (listener != null) {
-                    data.whenSucceeded({
-                        listener.onSampleProgressSpinnerSucceeded()
-                    }, whenFailed = {
-                        listener.onSampleProgressSpinnerFailed(it)
-                    }) ?: run {
-                        listener.onSampleProgressSpinnerCanceled()
-                    }
+
+                data.whenSucceeded({
+                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerSucceeded()
+                }, whenFailed = {
+                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerFailed(it)
+                }) ?: run {
+                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerCanceled()
                 }
             }
         }

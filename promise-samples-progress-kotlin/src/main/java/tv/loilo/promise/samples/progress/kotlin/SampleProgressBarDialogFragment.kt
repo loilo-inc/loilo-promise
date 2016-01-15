@@ -104,16 +104,15 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment(), ProgressPromi
     override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>) {
         postOnUi {
             if (isResumed) {
-                val listener = resolveListener<OnFinishedListener>()
+
                 dismiss()
-                if (listener != null) {
-                    data.whenSucceeded({
-                        listener.onSampleProgressBarSucceeded()
-                    }, whenFailed = {
-                        listener.onSampleProgressBarFailed(it)
-                    }) ?: run {
-                        listener.onSampleProgressBarCanceled()
-                    }
+
+                data.whenSucceeded({
+                    resolveListener<OnFinishedListener>()?.onSampleProgressBarSucceeded()
+                }, whenFailed = {
+                    resolveListener<OnFinishedListener>()?.onSampleProgressBarFailed(it)
+                }) ?: run {
+                    resolveListener<OnFinishedListener>()?.onSampleProgressBarCanceled()
                 }
             }
         }

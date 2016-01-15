@@ -30,11 +30,11 @@ fun LoaderManager.cancelLoader(id: Int) {
 
 fun <TData> createPromiseLoader(
         context: Context,
-        createPromise: () -> Promise<TData>,
+        createPromise: (PromiseLoader<TData>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null): PromiseLoader<TData> {
     return object : PromiseLoader<TData>(context) {
         override fun onCreatePromise(): Promise<TData>? {
-            return createPromise()
+            return createPromise(this)
         }
 
         override fun onClearDataCache(cache: TData) {
@@ -43,11 +43,11 @@ fun <TData> createPromiseLoader(
     }
 }
 
-fun <TLoader, TFragment, TData, TProgress> createProgressPromiseLoader(
+fun <TFragment, TData, TProgress> createProgressPromiseLoader(
         fragment: TFragment,
         createPromise: (ProgressPromiseLoader<TFragment, TData, TProgress>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null): ProgressPromiseLoader<TFragment, TData, TProgress>
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
+        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress> {
     return ProgressPromiseLoader.createLoader(fragment, createPromise, clearDataCache)
 }
 
