@@ -17,6 +17,7 @@
             <option value="$PROJECT_DIR$/promise-samples-progress-kotlin" />
             <option value="$PROJECT_DIR$/promise-support" />
             <option value="$PROJECT_DIR$/promise-support-kotlin" />
+            <option value="$PROJECT_DIR$/promise-uitest-kotlin" />
           </set>
         </option>
       </GradleProjectSettings>
