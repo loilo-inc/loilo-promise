@@ -15,7 +15,8 @@
  */
 
 // from https://github.com/chrisbanes/gradle-mvn-push
-// and https://github.com/JakeWharton/butterknife/blob/master/gradle/gradle-mvn-push.gradle
+// and ref https://github.com/JakeWharton/butterknife/blob/master/gradle/gradle-mvn-push.gradle
+// Edit about generating javadoc.
 
 apply plugin: 'maven'
 apply plugin: 'signing'
