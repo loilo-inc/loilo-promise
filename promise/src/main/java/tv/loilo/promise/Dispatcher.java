@@ -53,7 +53,7 @@ public final class Dispatcher {
         return mHandler.getLooper().getThread() == Thread.currentThread();
     }
 
-    public void run(final Runnable runnable) {
+    public void run(Runnable runnable) {
         if (isCurrentThread()) {
             runnable.run();
         } else {
@@ -61,8 +61,16 @@ public final class Dispatcher {
         }
     }
 
-    public void post(final Runnable runnable) {
+    public void post(Runnable runnable) {
         mHandler.post(runnable);
+    }
+
+    public void post(Runnable runnable, long delayMills){
+        mHandler.postDelayed(runnable, delayMills);
+    }
+
+    public void remove(Runnable runnable){
+        mHandler.removeCallbacks(runnable);
     }
 
     public <T> Deferred<T> call(final Callable<T> callable) {

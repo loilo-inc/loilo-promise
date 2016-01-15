@@ -17,6 +17,7 @@
 package tv.loilo.promise.kotlin
 
 import tv.loilo.promise.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 fun runOnUi(process: () -> Unit) {
     Dispatcher.getMainDispatcher().run(process)
@@ -24,6 +25,38 @@ fun runOnUi(process: () -> Unit) {
 
 fun postOnUi(process: () -> Unit) {
     Dispatcher.getMainDispatcher().post(process)
+}
+
+fun postOnUi(process: () -> Unit, delayMills: Long) {
+    Dispatcher.getMainDispatcher().post(process, delayMills)
+}
+
+fun postOnUiWithCancel(process: () -> Unit): Cancellable {
+    val isCalled = AtomicBoolean()
+    val runnable = Runnable {
+        isCalled.set(true)
+        process.invoke()
+    }
+    Dispatcher.getMainDispatcher().post(runnable)
+    return Cancellable {
+        if (!isCalled.get()) {
+            Dispatcher.getMainDispatcher().remove(runnable)
+        }
+    }
+}
+
+fun postOnUiWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
+    val isCalled = AtomicBoolean()
+    val runnable = Runnable {
+        isCalled.set(true)
+        process.invoke()
+    }
+    Dispatcher.getMainDispatcher().post(runnable, delayMills)
+    return Cancellable {
+        if (!isCalled.get()) {
+            Dispatcher.getMainDispatcher().remove(runnable)
+        }
+    }
 }
 
 fun <T> callOnUi(process: () -> T): Deferred<T> {
