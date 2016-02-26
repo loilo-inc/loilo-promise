@@ -43,7 +43,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment(), ProgressPromi
         val LOADER_ID = 0
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val progressDialog = ProgressDialog(context, theme)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100

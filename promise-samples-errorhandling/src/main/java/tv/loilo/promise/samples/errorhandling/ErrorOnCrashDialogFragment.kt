@@ -33,7 +33,7 @@ import tv.loilo.promise.support.kotlin.createPromiseLoader
  */
 class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit> {
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val progressDialog = ProgressDialog(context)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         progressDialog.setMessage("Loading...")

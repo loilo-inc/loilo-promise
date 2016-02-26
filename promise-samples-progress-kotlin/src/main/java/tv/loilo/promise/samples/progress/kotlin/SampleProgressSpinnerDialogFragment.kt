@@ -40,7 +40,7 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment(), PromiseLo
         val LOADER_ID = 0
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog? {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val progressDialog = ProgressDialog(context, theme)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         progressDialog.setMessage("Loading...")
