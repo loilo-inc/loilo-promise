@@ -33,7 +33,7 @@ fun <TData> createPromiseLoader(
         createPromise: (PromiseLoader<TData>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null): PromiseLoader<TData> {
     return object : PromiseLoader<TData>(context) {
-        override fun onCreatePromise(): Promise<TData>? {
+        override fun onCreatePromise(): Promise<TData> {
             return createPromise(this)
         }
 
