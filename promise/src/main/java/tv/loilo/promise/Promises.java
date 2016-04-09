@@ -40,7 +40,7 @@ public final class Promises {
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
      * Promise will be executing when you called a method to submit.
-     *
+     * <p/>
      * If Promise is canceled before the callback execution,
      * this callback call is skipped, and calls the subsequent callback.
      *
@@ -377,6 +377,16 @@ public final class Promises {
         }
 
         @Override
+        public Canceller submitOn(Scheduler scheduler, Object tag) {
+            return mEntryPoint.submitOn(scheduler, tag);
+        }
+
+        @Override
+        public Canceller submitOn(Scheduler scheduler) {
+            return submitOn(scheduler, null);
+        }
+
+        @Override
         public void execute(final Result<TIn> input, final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
             mFinishCallback.run(new FinishParams<>(input, scope, tag));
         }
@@ -488,6 +498,16 @@ public final class Promises {
         }
 
         @Override
+        public Canceller submitOn(Scheduler scheduler, Object tag) {
+            return mEntryPoint.submitOn(scheduler, tag);
+        }
+
+        @Override
+        public Canceller submitOn(Scheduler scheduler) {
+            return submitOn(scheduler, null);
+        }
+
+        @Override
         public <TNextOut> Promise<TNextOut> then(ThenCallback<TOut, TNextOut> thenCallback) {
             final ContinuationPromise<TOut, TNextOut> continuationTask = new ContinuationPromise<>(mEntryPoint, thenCallback);
             setNextPoint(continuationTask);
@@ -553,7 +573,7 @@ public final class Promises {
         }
     }
 
-    private static final class InitialPromise<TOut> implements Promise<TOut>, EntryPoint {
+    private static final class InitialPromise<TOut> implements Promise<TOut>, EntryPoint, Job {
 
         private final WhenCallback<TOut> mWhenCallback;
         private NextPoint<TOut> mNextPoint;
@@ -644,8 +664,7 @@ public final class Promises {
             });
         }
 
-        @Override
-        public Canceller submitOn(final ExecutorService executorService, final Object tag) {
+        private Canceller submitOn(final ExecutorService executorService, final Object tag, final Runnable postProcess) {
             //This method is the entry point of Promise. All of the instances of other Promise eventually call this.
 
             final FutureCanceller canceller = new FutureCanceller(new Runnable() {
@@ -681,6 +700,7 @@ public final class Promises {
                         } catch (final Error e) {
 
                             if (!hasCriticalError) {
+                                hasCriticalError = true;
                                 Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred on canceling.", e);
                                 Dispatcher.getMainDispatcher().run(new Runnable() {
                                     @Override
@@ -689,6 +709,10 @@ public final class Promises {
                                         throw e;
                                     }
                                 });
+                            }
+                        } finally {
+                            if (!hasCriticalError && postProcess != null) {
+                                postProcess.run();
                             }
                         }
                     }
@@ -732,6 +756,7 @@ public final class Promises {
                         } catch (final Error e) {
 
                             if (!hasCriticalError) {
+                                hasCriticalError = true;
                                 Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred.", e);
                                 Dispatcher.getMainDispatcher().run(new Runnable() {
                                     @Override
@@ -741,6 +766,10 @@ public final class Promises {
                                     }
                                 });
                             }
+                        } finally {
+                            if (!hasCriticalError && postProcess != null) {
+                                postProcess.run();
+                            }
                         }
                     }
                 }
@@ -749,6 +778,11 @@ public final class Promises {
             return canceller;
         }
 
+
+        @Override
+        public Canceller submitOn(final ExecutorService executorService, final Object tag) {
+            return submitOn(executorService, tag, null);
+        }
 
         @Override
         public Canceller submitOn(ExecutorService executorService) {
@@ -763,6 +797,71 @@ public final class Promises {
         @Override
         public Canceller submit() {
             return submitOn(mDefaultExecutorService);
+        }
+
+
+        @Override
+        public Canceller doWork(Object tag, Runnable postProcess) {
+            return submitOn(mDefaultExecutorService, tag, postProcess);
+        }
+
+        @Override
+        public void giveUp(final Object tag) {
+            mDefaultExecutorService.execute(new Runnable() {
+                @Override
+                public void run() {
+                    boolean hasCriticalError = false;
+                    final ArrayCloseableStack scope = new ArrayCloseableStack();
+                    try {
+                        execute(CancelTokens.CANCELED, scope, tag);
+                    } catch (final RuntimeException e) {
+                        hasCriticalError = true;
+                        Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
+                        Dispatcher.getMainDispatcher().run(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Throw on main thread to crash the application.
+                                throw e;
+                            }
+                        });
+                    } catch (final Error e) {
+                        hasCriticalError = true;
+                        Log.wtf("loilo-promise", "InitialPromise: Promise error occurred on canceling.", e);
+                        Dispatcher.getMainDispatcher().run(new Runnable() {
+                            @Override
+                            public void run() {
+                                //Throw on main thread to crash the application.
+                                throw e;
+                            }
+                        });
+                    } finally {
+                        try {
+                            scope.close();
+                        } catch (final Error e) {
+                            if (!hasCriticalError) {
+                                Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred on canceling.", e);
+                                Dispatcher.getMainDispatcher().run(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Throw on main thread to crash the application.
+                                        throw e;
+                                    }
+                                });
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public Canceller submitOn(Scheduler scheduler, Object tag) {
+            return scheduler.post(this, tag);
+        }
+
+        @Override
+        public Canceller submitOn(Scheduler scheduler) {
+            return submitOn(scheduler, null);
         }
 
         @Override
