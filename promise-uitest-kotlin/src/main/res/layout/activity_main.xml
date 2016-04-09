@@ -22,4 +22,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"/>
+
+    <Button
+        android:id="@+id/slave_greet_after_3sec_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Greet after 3sec(Slave)"/>
+
+    <Button
+        android:id="@+id/slave_cancel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cancel(Slave)"/>
 </LinearLayout>
