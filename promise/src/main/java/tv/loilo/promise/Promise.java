@@ -45,6 +45,16 @@ public interface Promise<TOut> extends Submittable {
     Deferred<TOut> getOn(ExecutorService executorService, Tagged state);
 
     /**
+     * Executes this promise on any other scheduler and returns a deferred result value.
+     * Use this when you want to execute a Promise on any Promises callbacks.
+     *
+     * @param scheduler the execution scheduler
+     * @param state     the state of current execution context
+     * @return a deferred result value
+     */
+    Deferred<TOut> getOn(Scheduler scheduler, Tagged state);
+
+    /**
      * Promise to execute this promise on a specified ExecutorService.
      *
      * @param executorService to submit a task for promise execution
@@ -53,11 +63,20 @@ public interface Promise<TOut> extends Submittable {
     Promise<TOut> promiseOn(ExecutorService executorService);
 
     /**
+     * Promise to execute this promise on any other scheduler.
+     *
+     * @param scheduler the execution scheduler
+     * @return promise to execute on a specified ExecutorService
+     */
+    Promise<TOut> promiseOn(Scheduler scheduler);
+
+
+    /**
      * Sets the callback when this promise is completed(succeeded or failed or canceled).
      * The callback will be execute asynchronously on background thread.
      *
      * @param thenCallback the callback when this promise is completed
-     * @param <TNextOut> the type of callback output value
+     * @param <TNextOut>   the type of callback output value
      * @return promise to return a result value
      */
     <TNextOut> Promise<TNextOut> then(ThenCallback<TOut, TNextOut> thenCallback);
@@ -77,7 +96,7 @@ public interface Promise<TOut> extends Submittable {
      * The callback will be execute asynchronously on background thread.
      *
      * @param successCallback the callback when this promise is succeeded.
-     * @param <TNextOut> the type of the callback output value
+     * @param <TNextOut>      the type of the callback output value
      * @return promise to return a result value
      */
     <TNextOut> Promise<TNextOut> succeeded(SuccessCallback<TOut, TNextOut> successCallback);
@@ -104,7 +123,7 @@ public interface Promise<TOut> extends Submittable {
     /**
      * Exchanges this promise result to other value, if the promise is succeeded.
      *
-     * @param replace the value to exchange
+     * @param replace    the value to exchange
      * @param <TReplace> the specific type of replacing value
      * @return promise to return the exchanged result
      */

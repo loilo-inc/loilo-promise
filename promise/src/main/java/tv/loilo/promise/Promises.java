@@ -467,12 +467,39 @@ public final class Promises {
         }
 
         @Override
+        public Deferred<TOut> getOn(Scheduler scheduler, Tagged state) {
+            final Deferrable<TOut> deferred = new Deferrable<>();
+
+            final Canceller canceller = finish(new FinishCallback<TOut>() {
+                @Override
+                public void run(final FinishParams<TOut> params) {
+                    deferred.setResult(params.asResult());
+                }
+            }).submitOn(scheduler, state.getTag());
+
+            deferred.setCancellable(canceller);
+
+            return deferred;
+        }
+
+        @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
             return when(new WhenCallback<TOut>() {
 
                 @Override
                 public Deferred<TOut> run(WhenParams params) throws Exception {
                     return getOn(executorService, params);
+                }
+            });
+        }
+
+        @Override
+        public Promise<TOut> promiseOn(final Scheduler scheduler) {
+            return when(new WhenCallback<TOut>() {
+
+                @Override
+                public Deferred<TOut> run(WhenParams params) throws Exception {
+                    return getOn(scheduler, params);
                 }
             });
         }
@@ -654,12 +681,40 @@ public final class Promises {
         }
 
         @Override
+        public Deferred<TOut> getOn(Scheduler scheduler, Tagged state) {
+
+            final Deferrable<TOut> deferred = new Deferrable<>();
+
+            final Canceller canceller = finish(new FinishCallback<TOut>() {
+                @Override
+                public void run(final FinishParams<TOut> args) {
+                    deferred.setResult(args.asResult());
+                }
+            }).submitOn(scheduler, state.getTag());
+
+            deferred.setCancellable(canceller);
+
+            return deferred;
+        }
+
+        @Override
         public Promise<TOut> promiseOn(final ExecutorService executorService) {
             return when(new WhenCallback<TOut>() {
 
                 @Override
                 public Deferred<TOut> run(final WhenParams params) throws Exception {
                     return getOn(executorService, params);
+                }
+            });
+        }
+
+        @Override
+        public Promise<TOut> promiseOn(final Scheduler scheduler) {
+            return when(new WhenCallback<TOut>() {
+
+                @Override
+                public Deferred<TOut> run(final WhenParams params) throws Exception {
+                    return getOn(scheduler, params);
                 }
             });
         }
