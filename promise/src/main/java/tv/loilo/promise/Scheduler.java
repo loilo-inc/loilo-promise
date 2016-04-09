@@ -52,10 +52,7 @@ public class Scheduler {
     }
 
     private boolean isRunnable() {
-        if (mMaxThreads <= 0) {
-            return true;
-        }
-        return mMaxThreads > mRunningTasks.size();
+        return mMaxThreads <= 0 || mMaxThreads > mRunningTasks.size();
     }
 
     private void runTask(final Task task) {
