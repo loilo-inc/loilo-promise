@@ -54,4 +54,24 @@ public interface Submittable {
      * @return submitted task cancellation handle
      */
     Canceller submit();
+
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     * The task is scheduled by Scheduler and the task will running on default ExecutorService.
+     *
+     * @param scheduler the execution scheduler.
+     * @param tag       the tag associated with this execution (the tag can access from callback parameters)
+     * @return submitted task cancellation handle
+     */
+    Canceller submitOn(Scheduler scheduler, Object tag);
+
+
+    /**
+     * Submits a task of this object for execution and returns a task cancellation handle.
+     * The task is scheduled by Scheduler and the task will running on default ExecutorService.
+     *
+     * @param scheduler the execution scheduler.
+     * @return submitted task cancellation handle
+     */
+    Canceller submitOn(Scheduler scheduler);
 }

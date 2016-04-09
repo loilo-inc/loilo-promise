@@ -63,6 +63,50 @@ fun <T> callOnUi(process: () -> T): Deferred<T> {
     return Dispatcher.getMainDispatcher().call(process)
 }
 
+fun runOnBg(process: () -> Unit) {
+    Dispatcher.getSubDispatcher().run(process)
+}
+
+fun postOnBg(process: () -> Unit) {
+    Dispatcher.getSubDispatcher().post(process)
+}
+
+fun postOnBg(process: () -> Unit, delayMills: Long) {
+    Dispatcher.getSubDispatcher().post(process, delayMills)
+}
+
+fun postOnBgWithCancel(process: () -> Unit): Cancellable {
+    val isCalled = AtomicBoolean()
+    val runnable = Runnable {
+        isCalled.set(true)
+        process.invoke()
+    }
+    Dispatcher.getSubDispatcher().post(runnable)
+    return Cancellable {
+        if (!isCalled.get()) {
+            Dispatcher.getSubDispatcher().remove(runnable)
+        }
+    }
+}
+
+fun postOnBgWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
+    val isCalled = AtomicBoolean()
+    val runnable = Runnable {
+        isCalled.set(true)
+        process.invoke()
+    }
+    Dispatcher.getSubDispatcher().post(runnable, delayMills)
+    return Cancellable {
+        if (!isCalled.get()) {
+            Dispatcher.getSubDispatcher().remove(runnable)
+        }
+    }
+}
+
+fun <T> callOnBg(process: () -> T): Deferred<T> {
+    return Dispatcher.getSubDispatcher().call(process)
+}
+
 fun <T> promiseWhen(f: (WhenParams) -> Deferred<T>): Promise<T> {
     return Promises.`when`(f)
 }

@@ -645,4 +645,68 @@ public class PromisesTest extends AndroidTestCase {
 
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
+
+    public void testSchedule() throws Exception {
+        final Deferrable<String> deferrable = new Deferrable<>();
+
+        final Scheduler scheduler = new Scheduler(1);
+
+        Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                return Defer.success("Hello Promise");
+            }
+        }).finish(new FinishCallback<String>() {
+            @Override
+            public void run(FinishParams<String> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submitOn(scheduler);
+
+        assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
+    }
+
+    public void testSerialExecuting() throws Exception {
+
+        final Scheduler scheduler = new Scheduler(1);
+
+        final ManualResetEvent event1 = new ManualResetEvent(false);
+        final Deferrable<String> deferrable1 = new Deferrable<>();
+        Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                event1.await();
+                return Defer.success("Hello Promise 1");
+            }
+        }).finish(new FinishCallback<String>() {
+            @Override
+            public void run(FinishParams<String> params) {
+                deferrable1.setResult(params.asResult());
+            }
+        }).submitOn(scheduler);
+
+        final ManualResetEvent event2 = new ManualResetEvent(false);
+        final Deferrable<String> deferrable2 = new Deferrable<>();
+        Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                event2.set();
+                return Defer.success("Hello Promise 2");
+            }
+        }).finish(new FinishCallback<String>() {
+            @Override
+            public void run(FinishParams<String> params) {
+                deferrable2.setResult(params.asResult());
+            }
+        }).submitOn(scheduler);
+
+        assertFalse(event2.await(5, TimeUnit.SECONDS));
+
+        event1.set();
+
+        event2.await();
+
+        assertEquals("Hello Promise 1", deferrable1.getResult().safeGetValue());
+        assertEquals("Hello Promise 2", deferrable2.getResult().safeGetValue());
+    }
 }

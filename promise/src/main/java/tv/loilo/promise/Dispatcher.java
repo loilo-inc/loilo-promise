@@ -29,6 +29,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public final class Dispatcher {
 
     private static Dispatcher mMainDispatcher = null;
+    private static MessageLoop mSubMessageLoop = null;
+    private static Dispatcher mSubDispatcher = null;
+
     private final Handler mHandler;
 
     public Dispatcher(Looper looper) {
@@ -44,6 +47,23 @@ public final class Dispatcher {
                     mMainDispatcher = new Dispatcher(Looper.getMainLooper());
                 }
                 dispatcher = mMainDispatcher;
+            }
+        }
+        return dispatcher;
+    }
+
+    public static Dispatcher getSubDispatcher() {
+        Dispatcher dispatcher = mSubDispatcher;
+        if (dispatcher == null) {
+            //Double check locking.
+            synchronized (Dispatcher.class) {
+                if (mSubDispatcher == null) {
+                    if (mSubMessageLoop == null) {
+                        mSubMessageLoop = MessageLoop.run();
+                    }
+                    mSubDispatcher = new Dispatcher(mSubMessageLoop.getLooper());
+                }
+                dispatcher = mSubDispatcher;
             }
         }
         return dispatcher;
