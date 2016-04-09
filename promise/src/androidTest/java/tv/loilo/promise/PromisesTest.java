@@ -709,4 +709,50 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise 1", deferrable1.getResult().safeGetValue());
         assertEquals("Hello Promise 2", deferrable2.getResult().safeGetValue());
     }
+
+    public void testGetOnScheduler() throws Exception {
+        final Scheduler scheduler = new Scheduler(1);
+        final Deferrable<Integer> deferrable = new Deferrable<>();
+        Promises.when(new WhenCallback<Integer>() {
+            @Override
+            public Deferred<Integer> run(WhenParams params) throws Exception {
+                return Promises.when(new WhenCallback<Integer>() {
+                    @Override
+                    public Deferred<Integer> run(WhenParams params) throws Exception {
+                        return Defer.success(616);
+                    }
+                }).getOn(scheduler, params);
+            }
+        }).finish(new FinishCallback<Integer>() {
+            @Override
+            public void run(FinishParams<Integer> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submit();
+
+        assertEquals(616, deferrable.getResult().safeGetValue().intValue());
+    }
+
+    public void testPromiseOnScheduler() throws Exception {
+        final Scheduler scheduler = new Scheduler(1);
+        final Deferrable<Integer> deferrable = new Deferrable<>();
+        Promises.when(new WhenCallback<Integer>() {
+            @Override
+            public Deferred<Integer> run(WhenParams params) throws Exception {
+                return Promises.when(new WhenCallback<Integer>() {
+                    @Override
+                    public Deferred<Integer> run(WhenParams params) throws Exception {
+                        return Defer.success(616);
+                    }
+                }).promiseOn(scheduler).get(params);
+            }
+        }).finish(new FinishCallback<Integer>() {
+            @Override
+            public void run(FinishParams<Integer> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submit();
+
+        assertEquals(616, deferrable.getResult().safeGetValue().intValue());
+    }
 }
