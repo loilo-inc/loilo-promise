@@ -63,48 +63,48 @@ fun <T> callOnUi(process: () -> T): Deferred<T> {
     return Dispatcher.getMainDispatcher().call(process)
 }
 
-fun runOnSlave(process: () -> Unit) {
-    Dispatcher.getSlaveDispatcher().run(process)
+fun runOnBg(process: () -> Unit) {
+    Dispatcher.getSubDispatcher().run(process)
 }
 
-fun postOnSlave(process: () -> Unit) {
-    Dispatcher.getSlaveDispatcher().post(process)
+fun postOnBg(process: () -> Unit) {
+    Dispatcher.getSubDispatcher().post(process)
 }
 
-fun postOnSlave(process: () -> Unit, delayMills: Long) {
-    Dispatcher.getSlaveDispatcher().post(process, delayMills)
+fun postOnBg(process: () -> Unit, delayMills: Long) {
+    Dispatcher.getSubDispatcher().post(process, delayMills)
 }
 
-fun postOnSlaveWithCancel(process: () -> Unit): Cancellable {
+fun postOnBgWithCancel(process: () -> Unit): Cancellable {
     val isCalled = AtomicBoolean()
     val runnable = Runnable {
         isCalled.set(true)
         process.invoke()
     }
-    Dispatcher.getSlaveDispatcher().post(runnable)
+    Dispatcher.getSubDispatcher().post(runnable)
     return Cancellable {
         if (!isCalled.get()) {
-            Dispatcher.getSlaveDispatcher().remove(runnable)
+            Dispatcher.getSubDispatcher().remove(runnable)
         }
     }
 }
 
-fun postOnSlaveWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
+fun postOnBgWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
     val isCalled = AtomicBoolean()
     val runnable = Runnable {
         isCalled.set(true)
         process.invoke()
     }
-    Dispatcher.getSlaveDispatcher().post(runnable, delayMills)
+    Dispatcher.getSubDispatcher().post(runnable, delayMills)
     return Cancellable {
         if (!isCalled.get()) {
-            Dispatcher.getSlaveDispatcher().remove(runnable)
+            Dispatcher.getSubDispatcher().remove(runnable)
         }
     }
 }
 
-fun <T> callOnSlave(process: () -> T): Deferred<T> {
-    return Dispatcher.getSlaveDispatcher().call(process)
+fun <T> callOnBg(process: () -> T): Deferred<T> {
+    return Dispatcher.getSubDispatcher().call(process)
 }
 
 fun <T> promiseWhen(f: (WhenParams) -> Deferred<T>): Promise<T> {
