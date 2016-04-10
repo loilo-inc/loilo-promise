@@ -40,7 +40,7 @@ public final class Promises {
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
      * Promise will be executing when you called a method to submit.
-     * <p/>
+     *
      * If Promise is canceled before the callback execution,
      * this callback call is skipped, and calls the subsequent callback.
      *
