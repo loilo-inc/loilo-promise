@@ -67,9 +67,8 @@ public class Scheduler {
                             return;
                         }
                         final Task next = mPendingTasks.get(0);
-                        if (next != null) {
-                            runTask(next);
-                        }
+                        mPendingTasks.remove(0);
+                        runTask(next);
                     }
                 });
             }
