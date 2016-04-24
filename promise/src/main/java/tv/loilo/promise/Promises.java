@@ -37,7 +37,7 @@ public final class Promises {
     private Promises() {
     }
 
-    public static <TIn, TOut extends MashUp<TIn>> Promise<TOut> whenAll(final TOut mashUp, final Promise<TIn>... promises) {
+    public static <TIn, TOut extends Mashup<TIn>> Promise<TOut> whenAll(final TOut mashup, final Promise<TIn>... promises) {
         return when(new WhenCallback<TOut>() {
             @Override
             public Deferred<TOut> run(WhenParams entryParams) throws Exception {
@@ -70,7 +70,7 @@ public final class Promises {
                                         return Defer.fail(e);
                                     }
 
-                                    mashUp.add(capture, eachParams.getValue());
+                                    mashup.add(capture, eachParams.getValue());
                                     return Defer.success(null);
                                 }
                             }).getOn(scheduler, eachParams);
@@ -99,7 +99,7 @@ public final class Promises {
                                     if (e != null) {
                                         deferrable.setFailed(e);
                                     } else {
-                                        deferrable.setSucceeded(mashUp);
+                                        deferrable.setSucceeded(mashup);
                                     }
                                 }
                             }
@@ -176,7 +176,7 @@ public final class Promises {
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
      * Promise will be executing when you called a method to submit.
-     * 
+     *
      * If Promise is canceled before the callback execution,
      * this callback call is skipped, and calls the subsequent callback.
      *
