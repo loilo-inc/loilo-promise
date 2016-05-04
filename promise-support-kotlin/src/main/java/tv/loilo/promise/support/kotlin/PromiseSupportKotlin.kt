@@ -21,6 +21,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import tv.loilo.promise.Promise
 import tv.loilo.promise.support.ProgressPromiseLoader
+import tv.loilo.promise.support.ProgressPromiseLoader2
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks
 import tv.loilo.promise.support.PromiseLoader
 
@@ -59,4 +60,20 @@ fun <TLoader, TFragment, TData, TProgress> attachProgressPromiseLoader(id: Int, 
 fun <TLoader, TFragment, TData, TProgress> detachProgressPromiseLoader(id: Int, fragment: TFragment)
         where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
     ProgressPromiseLoader.detachLoader(id, fragment)
+}
+
+fun <TData, TProgress> createProgressPromiseLoader2(
+        context: Context,
+        createPromise: (ProgressPromiseLoader2<TData, TProgress>) -> Promise<TData>,
+        clearDataCache: ((TData) -> Unit)? = null)
+        : ProgressPromiseLoader2<TData, TProgress> {
+    return ProgressPromiseLoader2.createLoader(context, createPromise, clearDataCache)
+}
+
+fun <TData, TProgress> LoaderManager.attachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
+    ProgressPromiseLoader2.attachProgressCallback(this, id, loaderCallbacks)
+}
+
+fun <TData, TProgress> LoaderManager.detachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
+    ProgressPromiseLoader2.detachProgressCallback(this, id, loaderCallbacks);
 }
