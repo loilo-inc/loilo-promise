@@ -16,27 +16,6 @@
 
 package tv.loilo.promise;
 
-/**
- * The fixed states of cancellation.
- */
-public final class CancelTokens {
-
-    public static final CancelToken CANCELED = new StaticCancelToken(true);
-    public static final CancelToken NONE = new StaticCancelToken(false);
-
-    private CancelTokens() {
-    }
-
-    private static class StaticCancelToken implements CancelToken {
-        private final boolean mIsCanceled;
-
-        public StaticCancelToken(boolean isCanceled) {
-            mIsCanceled = isCanceled;
-        }
-
-        @Override
-        public boolean isCanceled() {
-            return mIsCanceled;
-        }
-    }
+public interface ProgressReporter<TProgress> {
+    void report(final TProgress progress);
 }

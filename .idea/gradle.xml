@@ -9,6 +9,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/promise" />
+            <option value="$PROJECT_DIR$/promise-http" />
             <option value="$PROJECT_DIR$/promise-kotlin" />
             <option value="$PROJECT_DIR$/promise-samples-errorhandling" />
             <option value="$PROJECT_DIR$/promise-samples-progress" />
@@ -22,6 +23,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/promise" />
+            <option value="$PROJECT_DIR$/promise-http" />
             <option value="$PROJECT_DIR$/promise-kotlin" />
             <option value="$PROJECT_DIR$/promise-samples-errorhandling" />
             <option value="$PROJECT_DIR$/promise-samples-progress" />

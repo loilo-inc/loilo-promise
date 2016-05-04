@@ -18,6 +18,8 @@ package tv.loilo.promise;
 
 import android.test.AndroidTestCase;
 
+import junit.framework.Assert;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -754,5 +756,73 @@ public class PromisesTest extends AndroidTestCase {
         }).submit();
 
         assertEquals(616, deferrable.getResult().safeGetValue().intValue());
+    }
+
+    public void testWhenAll() throws Exception {
+
+        final Deferrable<Mashup<String>> deferrable = new Deferrable<>();
+
+        final String[] results = new String[2];
+
+        Promises.whenAll(new Mashup<String>() {
+            @Override
+            public void add(int index, String input) {
+                results[index] = input;
+            }
+        }, Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                return Defer.success("A");
+            }
+        }), Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                return Defer.success("B");
+            }
+        })).finish(new FinishCallback<Mashup<String>>() {
+            @Override
+            public void run(FinishParams<Mashup<String>> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submit();
+
+        deferrable.getResult().safeGetValue();
+
+        assertEquals("A", results[0]);
+        assertEquals("B", results[1]);
+    }
+
+    public void testWhenAny() throws Exception {
+        final ManualResetEvent noSignal = new ManualResetEvent(false);
+        final ManualResetEvent aborted = new ManualResetEvent(false);
+        final Deferrable<String> deferrable = new Deferrable<>();
+        Promises.whenAny(Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                return Defer.success("A");
+            }
+        }), Promises.when(new WhenCallback<String>() {
+            @Override
+            public Deferred<String> run(WhenParams params) throws Exception {
+                noSignal.await();
+                return Defer.success("B");
+            }
+        }).watch(new WatchCallback<String>() {
+            @Override
+            public void run(WatchParams<String> params) throws Exception {
+                aborted.set();
+            }
+        })).finish(new FinishCallback<String>() {
+            @Override
+            public void run(FinishParams<String> params) {
+                deferrable.setResult(params.asResult());
+            }
+        }).submit();
+
+        final String value = deferrable.getResult().safeGetValue();
+        Assert.assertEquals("A", value);
+
+        Assert.assertTrue(aborted.await(20, TimeUnit.SECONDS));
+
     }
 }

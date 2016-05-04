@@ -16,27 +16,17 @@
 
 package tv.loilo.promise;
 
-/**
- * The fixed states of cancellation.
- */
-public final class CancelTokens {
+public interface Progress {
+    //表示用の分解能です。
+    int MAX = 1000;
 
-    public static final CancelToken CANCELED = new StaticCancelToken(true);
-    public static final CancelToken NONE = new StaticCancelToken(false);
+    int getCurrent();
 
-    private CancelTokens() {
-    }
+    double getPercentage();
 
-    private static class StaticCancelToken implements CancelToken {
-        private final boolean mIsCanceled;
+    long getRawCurrent();
 
-        public StaticCancelToken(boolean isCanceled) {
-            mIsCanceled = isCanceled;
-        }
+    long getRawMax();
 
-        @Override
-        public boolean isCanceled() {
-            return mIsCanceled;
-        }
-    }
+    String getMessage();
 }
