@@ -6,6 +6,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private final ProgressPromiseLoaderCallbacks<List<String>, HttpProgress> mLoaderCallbacks = new ProgressPromiseLoaderCallbacks<List<String>, HttpProgress>() {
         @Override
         public void onLoaderProgress(int id, @NonNull HttpProgress httpProgress) {
+            Log.d("loilo-promise", httpProgress.toString());
             if (mProgressBar != null) {
                 mProgressBar.setProgress(httpProgress.getCurrent());
             }
@@ -60,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public Deferred<ResponseAs<JsonArray>> run(final WhenParams params) throws Exception {
                             final OkHttpClient client = new OkHttpClient();
-                            final Request req = new Request.Builder().url("").get().build();
+                            final Request req = new Request.Builder().url("https://raw.githubusercontent.com/loilo-inc/loilo-promise/withOkhttp/promise-samples-http/src/androidTest/assets/sample.json").get().build();
                             final Call call = client.newCall(req);
                             return new HttpTask(call).asJsonArray().progress(new ProgressReporter<HttpProgress>() {
                                 @Override

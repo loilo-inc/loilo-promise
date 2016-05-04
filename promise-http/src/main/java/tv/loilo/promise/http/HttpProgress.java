@@ -81,4 +81,15 @@ public final class HttpProgress implements Progress {
         final double percentage = getPercentage(rawCurrent, rawMax);
         return Math.max(0, Math.min(MAX, (int) Math.round(MAX * percentage)));
     }
+
+    @Override
+    public String toString() {
+        return "HttpProgress{" +
+                "mPhase=" + mPhase +
+                ", mCode=" + mCode +
+                ", mBytesProceeded=" + mBytesProceeded +
+                ", mContentLength=" + mContentLength +
+                ", mMessage='" + mMessage + '\'' +
+                '}';
+    }
 }
