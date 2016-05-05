@@ -40,11 +40,60 @@ import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.support.PromiseLoader;
 import tv.loilo.promise.support.PromiseLoaderCallbacks;
 
-/**
- * Created by pepeotoito on 2015/12/26.
- */
-public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment implements PromiseLoaderCallbacks<Void> {
+public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment {
     private static final int LOADER_ID = 0;
+
+    private final PromiseLoaderCallbacks<Void> mLoaderCallbacks = new PromiseLoaderCallbacks<Void>() {
+        @Override
+        public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
+            return new PromiseLoader<Void>(getContext()) {
+                @NonNull
+                @Override
+                protected Promise<Void> onCreatePromise() throws Exception {
+                    return Promises.when(new WhenCallback<Void>() {
+                        @Override
+                        public Deferred<Void> run(WhenParams params) throws Exception {
+                            TimeUnit.SECONDS.sleep(10);
+                            return Defer.success(null);
+                        }
+                    });
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Result<Void>> loader, final Result<Void> data) {
+            Dispatcher.getMainDispatcher().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (isResumed()) {
+                        dismiss();
+
+                        final OnFinishedListener listener = resolveListener();
+
+                        if (listener != null) {
+                            if (data.getCancelToken().isCanceled()) {
+                                listener.onSampleProgressSpinnerCanceled();
+                                return;
+                            }
+
+                            final Exception e = data.getException();
+                            if (e != null) {
+                                listener.onSampleProgressSpinnerFailed(e);
+                            } else {
+                                listener.onSampleProgressSpinnerSucceeded();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Result<Void>> loader) {
+
+        }
+    };
 
     @NonNull
     @Override
@@ -66,7 +115,7 @@ public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment
         super.onActivityCreated(savedInstanceState);
 
         getDialog().setCancelable(false);
-        getLoaderManager().initLoader(LOADER_ID, Bundle.EMPTY, this);
+        getLoaderManager().initLoader(LOADER_ID, Bundle.EMPTY, mLoaderCallbacks);
     }
 
     @Override
@@ -80,56 +129,6 @@ public class SampleProgressSpinnerDialogFragment extends AppCompatDialogFragment
                 PromiseLoader.cancelLoader(getLoaderManager(), LOADER_ID);
             }
         });
-
-    }
-
-    @Override
-    public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
-        return new PromiseLoader<Void>(getContext()) {
-            @NonNull
-            @Override
-            protected Promise<Void> onCreatePromise() throws Exception {
-                return Promises.when(new WhenCallback<Void>() {
-                    @Override
-                    public Deferred<Void> run(WhenParams params) throws Exception {
-                        TimeUnit.SECONDS.sleep(10);
-                        return Defer.success(null);
-                    }
-                });
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Result<Void>> loader, final Result<Void> data) {
-        Dispatcher.getMainDispatcher().post(new Runnable() {
-            @Override
-            public void run() {
-                if (isResumed()) {
-                    dismiss();
-
-                    final OnFinishedListener listener = resolveListener();
-
-                    if (listener != null) {
-                        if (data.getCancelToken().isCanceled()) {
-                            listener.onSampleProgressSpinnerCanceled();
-                            return;
-                        }
-
-                        final Exception e = data.getException();
-                        if (e != null) {
-                            listener.onSampleProgressSpinnerFailed(e);
-                        } else {
-                            listener.onSampleProgressSpinnerSucceeded();
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Result<Void>> loader) {
 
     }
 

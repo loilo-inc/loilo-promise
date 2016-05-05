@@ -6,6 +6,7 @@ import android.support.v4.util.ArrayMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Locale;
 import java.util.Map;
 
 public final class HttpContentDisposition {
@@ -38,10 +39,10 @@ public final class HttpContentDisposition {
 
         final int dispositionTypeSeparatorIndex = trimContentDisposition.indexOf(";");
         if (dispositionTypeSeparatorIndex < 0) {
-            return new HttpContentDisposition(trimContentDisposition.toLowerCase());
+            return new HttpContentDisposition(trimContentDisposition.toLowerCase(Locale.US));
         }
 
-        final String dispositionType = trimContentDisposition.substring(0, dispositionTypeSeparatorIndex).toLowerCase();
+        final String dispositionType = trimContentDisposition.substring(0, dispositionTypeSeparatorIndex).toLowerCase(Locale.US);
         //System.out.println("dispositionType = " + dispositionType);
         if (dispositionTypeSeparatorIndex >= trimContentDisposition.length() - 1) {
             return new HttpContentDisposition(dispositionType);
@@ -103,7 +104,7 @@ public final class HttpContentDisposition {
 
                 final int keySeparatorIndex = record.indexOf('=');
                 if (keySeparatorIndex >= 0 && keySeparatorIndex < record.length() - 1) {
-                    final String key = record.substring(0, keySeparatorIndex).trim().toLowerCase();
+                    final String key = record.substring(0, keySeparatorIndex).trim().toLowerCase(Locale.US);
                     if (key.length() > 0) {
                         final String value = record.substring(keySeparatorIndex + 1).trim();
                         if (value.length() > 0) {

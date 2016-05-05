@@ -21,7 +21,14 @@ package tv.loilo.promise;
  */
 public final class CancelTokens {
 
+    /**
+     * The token that is always canceled.
+     */
     public static final CancelToken CANCELED = new StaticCancelToken(true);
+
+    /**
+     * The token that is always not canceled.
+     */
     public static final CancelToken NONE = new StaticCancelToken(false);
 
     private CancelTokens() {

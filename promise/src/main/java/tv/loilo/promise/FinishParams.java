@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link FinishCallback}.
  */
-public class FinishParams<TOut> extends ResultParams<TOut> {
+public final class FinishParams<TOut> extends ResultParams<TOut> {
     public FinishParams(Result<TOut> result, CloseableStack scope, Object tag) {
         super(result, scope, tag);
     }

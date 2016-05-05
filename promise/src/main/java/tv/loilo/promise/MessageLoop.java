@@ -20,7 +20,7 @@ import android.os.Looper;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MessageLoop {
+public final class MessageLoop {
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final Thread mThread;

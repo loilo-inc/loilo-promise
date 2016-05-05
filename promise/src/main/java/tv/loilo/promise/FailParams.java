@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link FailCallback}.
  */
-public class FailParams<T> implements ExecutionContext {
+public final class FailParams<T> implements ExecutionContext {
     private final Exception mException;
     private final CancelToken mCancelToken;
     private final CloseableStack mScope;

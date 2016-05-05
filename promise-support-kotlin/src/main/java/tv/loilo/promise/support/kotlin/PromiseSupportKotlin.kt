@@ -44,6 +44,7 @@ fun <TData> createPromiseLoader(
     }
 }
 
+@Deprecated("createProgressPromiseLoader2 instead.")
 fun <TFragment, TData, TProgress> createProgressPromiseLoader(
         fragment: TFragment,
         createPromise: (ProgressPromiseLoader<TFragment, TData, TProgress>) -> Promise<TData>,
@@ -52,11 +53,13 @@ fun <TFragment, TData, TProgress> createProgressPromiseLoader(
     return ProgressPromiseLoader.createLoader(fragment, createPromise, clearDataCache)
 }
 
+@Deprecated("attachProgressCallback instead.")
 fun <TLoader, TFragment, TData, TProgress> attachProgressPromiseLoader(id: Int, fragment: TFragment)
         where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
     ProgressPromiseLoader.attachLoader(id, fragment)
 }
 
+@Deprecated("detachProgressCallback instead.")
 fun <TLoader, TFragment, TData, TProgress> detachProgressPromiseLoader(id: Int, fragment: TFragment)
         where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
     ProgressPromiseLoader.detachLoader(id, fragment)

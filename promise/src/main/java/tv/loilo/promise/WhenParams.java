@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link WhenCallback}.
  */
-public class WhenParams extends EntryParams {
+public final class WhenParams extends EntryParams {
     public WhenParams(CancelToken cancelToken, CloseableStack scope, Object tag) {
         super(cancelToken, scope, tag);
     }

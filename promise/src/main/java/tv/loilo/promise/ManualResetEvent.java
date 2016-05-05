@@ -20,7 +20,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ManualResetEvent {
+public final class ManualResetEvent {
 
     private AtomicReference<CountDownLatch> mLatch;
 

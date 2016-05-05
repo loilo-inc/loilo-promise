@@ -20,7 +20,7 @@ package tv.loilo.promise;
  * Class for the data transfer.
  * Uses in progress notification, etc.
  */
-public class Transfer<TData> implements TaggedCancelState {
+public final class Transfer<TData> implements TaggedCancelState {
 
     final Object mTag;
     private final CancelToken mCancelToken;

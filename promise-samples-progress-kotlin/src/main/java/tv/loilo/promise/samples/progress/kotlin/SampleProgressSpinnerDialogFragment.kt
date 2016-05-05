@@ -32,12 +32,44 @@ import tv.loilo.promise.support.kotlin.cancelLoader
 import tv.loilo.promise.support.kotlin.createPromiseLoader
 import java.util.concurrent.TimeUnit
 
-/**
- * Created by pepeotoito on 2015/12/27.
- */
-class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment(), PromiseLoaderCallbacks<Unit> {
+class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
     companion object {
         val LOADER_ID = 0
+    }
+
+    private val loaderCallbacks = object : PromiseLoaderCallbacks<Unit> {
+        override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
+
+        }
+
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
+            return createPromiseLoader(context, {
+                promiseWhen {
+                    defer {
+                        TimeUnit.SECONDS.sleep(10)
+                    }
+                }
+            })
+        }
+
+        override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>?) {
+
+            postOnUi {
+                if (isResumed) {
+
+                    dismiss()
+
+                    data?.whenSucceeded({
+                        resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerSucceeded()
+                    }, whenFailed = {
+                        resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerFailed(it)
+                    }) ?: run {
+                        resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerCanceled()
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -53,7 +85,7 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment(), PromiseLo
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog.setCancelable(false)
-        loaderManager.initLoader(LOADER_ID, Bundle.EMPTY, this)
+        loaderManager.initLoader(LOADER_ID, Bundle.EMPTY, loaderCallbacks)
     }
 
     override fun onStart() {
@@ -63,37 +95,6 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment(), PromiseLo
         progressDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.setOnClickListener { view ->
             loaderManager.cancelLoader(LOADER_ID)
         }
-    }
-
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-        return createPromiseLoader(context, {
-            promiseWhen {
-                defer {
-                    TimeUnit.SECONDS.sleep(10)
-                }
-            }
-        })
-    }
-
-    override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>) {
-        postOnUi {
-            if (isResumed) {
-
-                dismiss()
-
-                data.whenSucceeded({
-                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerSucceeded()
-                }, whenFailed = {
-                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerFailed(it)
-                }) ?: run {
-                    resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerCanceled()
-                }
-            }
-        }
-    }
-
-    override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
-
     }
 
     interface OnFinishedListener {

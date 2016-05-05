@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Parameters that are passed to {@link RepeatCallback}.
  */
-public class RepeatParams extends EntryParams {
+public final class RepeatParams extends EntryParams {
     private final AtomicInteger mIndex;
 
     public RepeatParams(AtomicInteger index, CancelToken cancelToken, CloseableStack scope, Object tag) {

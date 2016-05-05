@@ -33,6 +33,7 @@ import tv.loilo.promise.Transfer;
  * @param <TData>     the specified type of a success value
  * @param <TProgress> the specified type of progress value
  */
+@Deprecated
 public abstract class ProgressPromiseLoader<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
         extends PromiseLoader<TData> {
 

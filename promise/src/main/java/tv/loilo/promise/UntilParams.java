@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Parameters that are passed to {@link UntilCallback}.
  */
-public class UntilParams<T> extends ResultParams<T> {
+public final class UntilParams<T> extends ResultParams<T> {
 
     private final AtomicInteger mIndex;
 

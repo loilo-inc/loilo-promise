@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Parameters that are passed to {@link ForEachCallback}.
  */
-public class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
+public final class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
     private final AtomicInteger mIndex;
     private final TOperand mOperand;
 

@@ -29,18 +29,58 @@ import tv.loilo.promise.kotlin.postOnUi
 import tv.loilo.promise.kotlin.promiseWhen
 import tv.loilo.promise.kotlin.whenSucceeded
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks
-import tv.loilo.promise.support.kotlin.attachProgressPromiseLoader
+import tv.loilo.promise.support.kotlin.attachProgressCallback
 import tv.loilo.promise.support.kotlin.cancelLoader
-import tv.loilo.promise.support.kotlin.createProgressPromiseLoader
-import tv.loilo.promise.support.kotlin.detachProgressPromiseLoader
+import tv.loilo.promise.support.kotlin.createProgressPromiseLoader2
+import tv.loilo.promise.support.kotlin.detachProgressCallback
 import java.util.concurrent.TimeUnit
 
-/**
- * Created by pepeotoito on 2015/12/27.
- */
-class SampleProgressBarDialogFragment : AppCompatDialogFragment(), ProgressPromiseLoaderCallbacks<Unit, Int> {
+class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
     companion object {
         val LOADER_ID = 0
+    }
+
+    private var loaderCallbacks = object : ProgressPromiseLoaderCallbacks<Unit, Int> {
+        override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
+
+        }
+
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
+            return createProgressPromiseLoader2<Unit, Int>(context, { loader ->
+                promiseWhen {
+                    defer {
+                        for (i in 0..99) {
+                            loader.reportProgress(Transfer(it, i))
+                            TimeUnit.MILLISECONDS.sleep(100)
+                        }
+                        loader.reportProgress(Transfer(it, 100))
+                    }
+                }
+            })
+        }
+
+        override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>?) {
+            postOnUi {
+                if (isResumed) {
+
+                    dismiss()
+
+                    data?.whenSucceeded({
+                        resolveListener<OnFinishedListener>()?.onSampleProgressBarSucceeded()
+                    }, whenFailed = {
+                        resolveListener<OnFinishedListener>()?.onSampleProgressBarFailed(it)
+                    }) ?: run {
+                        resolveListener<OnFinishedListener>()?.onSampleProgressBarCanceled()
+                    }
+                }
+            }
+        }
+
+        override fun onLoaderProgress(id: Int, progress: Int) {
+            val progressDialog = dialog as? ProgressDialog
+            progressDialog?.progress = progress
+        }
+
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -58,7 +98,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment(), ProgressPromi
         super.onActivityCreated(savedInstanceState)
 
         dialog.setCancelable(false)
-        loaderManager.initLoader(LOADER_ID, Bundle.EMPTY, this)
+        loaderManager.initLoader(LOADER_ID, Bundle.EMPTY, loaderCallbacks)
     }
 
     override fun onStart() {
@@ -68,59 +108,14 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment(), ProgressPromi
         progressDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.setOnClickListener {
             loaderManager.cancelLoader(LOADER_ID)
         }
+
+        loaderManager.attachProgressCallback(LOADER_ID, loaderCallbacks)
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStop() {
+        super.onStop()
 
-        attachProgressPromiseLoader(LOADER_ID, this)
-    }
-
-    override fun onPause() {
-
-        detachProgressPromiseLoader(LOADER_ID, this)
-
-        super.onPause()
-    }
-
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-        return createProgressPromiseLoader(this, { loader ->
-            promiseWhen {
-                defer {
-                    for (i in 0..99) {
-                        loader.reportProgress(Transfer(it, i))
-                        TimeUnit.MILLISECONDS.sleep(100)
-                    }
-                    loader.reportProgress(Transfer(it, 100))
-                }
-            }
-        })
-    }
-
-    override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
-
-    }
-
-    override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>) {
-        postOnUi {
-            if (isResumed) {
-
-                dismiss()
-
-                data.whenSucceeded({
-                    resolveListener<OnFinishedListener>()?.onSampleProgressBarSucceeded()
-                }, whenFailed = {
-                    resolveListener<OnFinishedListener>()?.onSampleProgressBarFailed(it)
-                }) ?: run {
-                    resolveListener<OnFinishedListener>()?.onSampleProgressBarCanceled()
-                }
-            }
-        }
-    }
-
-    override fun onLoaderProgress(id: Int, progress: Int) {
-        val progressDialog = dialog as? ProgressDialog
-        progressDialog?.progress = progress
+        loaderManager.detachProgressCallback(LOADER_ID, loaderCallbacks)
     }
 
     interface OnFinishedListener {

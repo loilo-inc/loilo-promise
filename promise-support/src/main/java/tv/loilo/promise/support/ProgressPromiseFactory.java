@@ -28,6 +28,7 @@ import tv.loilo.promise.Promise;
  * @param <TData>     the specified type of a success value
  * @param <TProgress> the specified type of progress value
  */
+@Deprecated
 public interface ProgressPromiseFactory<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress> {
     @NonNull
     Promise<TData> createPromise(@NonNull ProgressPromiseLoader<TFragment, TData, TProgress> loader);

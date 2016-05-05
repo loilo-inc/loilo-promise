@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link ThenCallback}
  */
-public class ThenParams<TOut> extends ResultParams<TOut> {
+public final class ThenParams<TOut> extends ResultParams<TOut> {
     public ThenParams(Result<TOut> result, CloseableStack scope, Object tag) {
         super(result, scope, tag);
     }
