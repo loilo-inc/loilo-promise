@@ -31,7 +31,7 @@ import tv.loilo.promise.kotlin.whenSucceeded
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks
 import tv.loilo.promise.support.kotlin.attachProgressCallback
 import tv.loilo.promise.support.kotlin.cancelLoader
-import tv.loilo.promise.support.kotlin.createProgressPromiseLoader2
+import tv.loilo.promise.support.kotlin.createProgressPromiseLoader
 import tv.loilo.promise.support.kotlin.detachProgressCallback
 import java.util.concurrent.TimeUnit
 
@@ -46,7 +46,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
         }
 
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createProgressPromiseLoader2<Unit, Int>(context, { loader ->
+            return createProgressPromiseLoader<Unit, Int>(context, { loader ->
                 promiseWhen {
                     defer {
                         for (i in 0..99) {

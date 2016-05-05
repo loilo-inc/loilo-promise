@@ -27,7 +27,7 @@ import tv.loilo.promise.Promise;
 import tv.loilo.promise.Result;
 import tv.loilo.promise.Transfer;
 
-public abstract class ProgressPromiseLoader2<TData, TProgress> extends PromiseLoader<TData> {
+public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoader<TData> {
 
     @Nullable
     private ProgressPromiseLoaderCallbacks<TData, TProgress> mLoaderCallbacks;
@@ -35,15 +35,15 @@ public abstract class ProgressPromiseLoader2<TData, TProgress> extends PromiseLo
     @Nullable
     private TProgress mProgressCache;
 
-    public ProgressPromiseLoader2(Context context) {
+    public ProgressPromiseLoader(Context context) {
         super(context);
     }
 
     @NonNull
-    public static <TData, TProgress> ProgressPromiseLoader2<TData, TProgress> createLoader(
+    public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
             Context context,
-            @NonNull final ProgressPromiseFactory2<TData, TProgress> promiseFactory) {
-        return new ProgressPromiseLoader2<TData, TProgress>(context) {
+            @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory) {
+        return new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
@@ -53,11 +53,11 @@ public abstract class ProgressPromiseLoader2<TData, TProgress> extends PromiseLo
     }
 
     @NonNull
-    public static <TData, TProgress> ProgressPromiseLoader2<TData, TProgress> createLoader(
+    public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
             Context context,
-            @NonNull final ProgressPromiseFactory2<TData, TProgress> promiseFactory,
+            @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory,
             @Nullable final PromiseCacheCleaner<TData> dataCacheCleaner) {
-        return new ProgressPromiseLoader2<TData, TProgress>(context) {
+        return new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
@@ -79,7 +79,7 @@ public abstract class ProgressPromiseLoader2<TData, TProgress> extends PromiseLo
             return;
         }
 
-        @SuppressWarnings("unchecked") final ProgressPromiseLoader2<TData, TProgress> promiseLoader = (ProgressPromiseLoader2<TData, TProgress>) loader;
+        @SuppressWarnings("unchecked") final ProgressPromiseLoader<TData, TProgress> promiseLoader = (ProgressPromiseLoader<TData, TProgress>) loader;
         promiseLoader.attachLoaderCallbacks(loaderCallbacks);
     }
 
@@ -89,7 +89,7 @@ public abstract class ProgressPromiseLoader2<TData, TProgress> extends PromiseLo
             return;
         }
 
-        @SuppressWarnings("unchecked") final ProgressPromiseLoader2<TData, TProgress> promiseLoader = (ProgressPromiseLoader2<TData, TProgress>) loader;
+        @SuppressWarnings("unchecked") final ProgressPromiseLoader<TData, TProgress> promiseLoader = (ProgressPromiseLoader<TData, TProgress>) loader;
         promiseLoader.detachLoaderCallbacks(loaderCallbacks);
     }
 

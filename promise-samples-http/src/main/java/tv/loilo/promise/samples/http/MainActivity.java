@@ -53,8 +53,8 @@ import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.http.HttpProgress;
 import tv.loilo.promise.http.HttpTask;
 import tv.loilo.promise.http.ResponseAs;
-import tv.loilo.promise.support.ProgressPromiseFactory2;
-import tv.loilo.promise.support.ProgressPromiseLoader2;
+import tv.loilo.promise.support.ProgressPromiseFactory;
+import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
 
 public class MainActivity extends AppCompatActivity {
@@ -70,10 +70,10 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Loader<Result<List<String>>> onCreateLoader(int id, Bundle args) {
-            return ProgressPromiseLoader2.createLoader(MainActivity.this, new ProgressPromiseFactory2<List<String>, HttpProgress>() {
+            return ProgressPromiseLoader.createLoader(MainActivity.this, new ProgressPromiseFactory<List<String>, HttpProgress>() {
                 @NonNull
                 @Override
-                public Promise<List<String>> createPromise(@NonNull final ProgressPromiseLoader2<List<String>, HttpProgress> loader) {
+                public Promise<List<String>> createPromise(@NonNull final ProgressPromiseLoader<List<String>, HttpProgress> loader) {
                     return Promises.when(new WhenCallback<ResponseAs<JsonArray>>() {
                         @Override
                         public Deferred<ResponseAs<JsonArray>> run(final WhenParams params) throws Exception {
@@ -151,14 +151,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        ProgressPromiseLoader2.attachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
+        ProgressPromiseLoader.attachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
 
-        ProgressPromiseLoader2.detachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
+        ProgressPromiseLoader.detachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{

@@ -20,7 +20,7 @@ import android.support.annotation.NonNull;
 
 import tv.loilo.promise.Promise;
 
-public interface ProgressPromiseFactory2<TData, TProgress> {
+public interface ProgressPromiseFactory<TData, TProgress> {
     @NonNull
-    Promise<TData> createPromise(@NonNull ProgressPromiseLoader2<TData, TProgress> loader);
+    Promise<TData> createPromise(@NonNull ProgressPromiseLoader<TData, TProgress> loader);
 }

@@ -38,8 +38,8 @@ import tv.loilo.promise.Result;
 import tv.loilo.promise.Transfer;
 import tv.loilo.promise.WhenCallback;
 import tv.loilo.promise.WhenParams;
-import tv.loilo.promise.support.ProgressPromiseFactory2;
-import tv.loilo.promise.support.ProgressPromiseLoader2;
+import tv.loilo.promise.support.ProgressPromiseFactory;
+import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
 
 public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
@@ -55,10 +55,10 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
 
         @Override
         public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
-            return ProgressPromiseLoader2.createLoader(getContext(), new ProgressPromiseFactory2<Void, Integer>() {
+            return ProgressPromiseLoader.createLoader(getContext(), new ProgressPromiseFactory<Void, Integer>() {
                 @NonNull
                 @Override
-                public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader2<Void, Integer> loader) {
+                public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader<Void, Integer> loader) {
                     return Promises.when(new WhenCallback<Void>() {
                         @Override
                         public Deferred<Void> run(WhenParams params) throws Exception {
@@ -143,18 +143,18 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
         progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProgressPromiseLoader2.cancelLoader(getLoaderManager(), LOADER_ID);
+                ProgressPromiseLoader.cancelLoader(getLoaderManager(), LOADER_ID);
             }
         });
 
-        ProgressPromiseLoader2.attachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
+        ProgressPromiseLoader.attachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-        ProgressPromiseLoader2.detachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
+        ProgressPromiseLoader.detachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
     }
 
     private OnFinishedListener resolveListener() {

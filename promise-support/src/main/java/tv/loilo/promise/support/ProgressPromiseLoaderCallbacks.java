@@ -19,7 +19,7 @@ package tv.loilo.promise.support;
 import android.support.annotation.NonNull;
 
 /**
- * Extends android.support.v4.app.LoaderManager.LoaderCallbacks for {@link ProgressPromiseLoader2}.
+ * Extends android.support.v4.app.LoaderManager.LoaderCallbacks for {@link ProgressPromiseLoader}.
  *
  * @param <TData>     the specified type of a success value
  * @param <TProgress> the specified type of progress value
