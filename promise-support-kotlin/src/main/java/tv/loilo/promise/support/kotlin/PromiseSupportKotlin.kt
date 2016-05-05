@@ -17,10 +17,8 @@
 package tv.loilo.promise.support.kotlin
 
 import android.content.Context
-import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import tv.loilo.promise.Promise
-import tv.loilo.promise.support.ProgressPromiseLoader
 import tv.loilo.promise.support.ProgressPromiseLoader2
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks
 import tv.loilo.promise.support.PromiseLoader
@@ -42,27 +40,6 @@ fun <TData> createPromiseLoader(
             clearDataCache?.invoke(cache)
         }
     }
-}
-
-@Deprecated("createProgressPromiseLoader2 instead.")
-fun <TFragment, TData, TProgress> createProgressPromiseLoader(
-        fragment: TFragment,
-        createPromise: (ProgressPromiseLoader<TFragment, TData, TProgress>) -> Promise<TData>,
-        clearDataCache: ((TData) -> Unit)? = null): ProgressPromiseLoader<TFragment, TData, TProgress>
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress> {
-    return ProgressPromiseLoader.createLoader(fragment, createPromise, clearDataCache)
-}
-
-@Deprecated("attachProgressCallback instead.")
-fun <TLoader, TFragment, TData, TProgress> attachProgressPromiseLoader(id: Int, fragment: TFragment)
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
-    ProgressPromiseLoader.attachLoader(id, fragment)
-}
-
-@Deprecated("detachProgressCallback instead.")
-fun <TLoader, TFragment, TData, TProgress> detachProgressPromiseLoader(id: Int, fragment: TFragment)
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
-    ProgressPromiseLoader.detachLoader(id, fragment)
 }
 
 fun <TData, TProgress> createProgressPromiseLoader2(
