@@ -123,6 +123,18 @@ fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachPar
     return Promises.forEach(ite, operand, f)
 }
 
+fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<Unit> {
+    return Promises.whenAll(null, promises).exchange(Unit)
+}
+
+fun <T> promiseWhenAll(mashup: (Int, T) -> Unit, vararg promises: Promise<T>): Promise<Unit> {
+    return Promises.whenAll(mashup, promises).exchange(Unit)
+}
+
+fun <T> promiseWhenAny(vararg promises: Promise<T>): Promise<T> {
+    return Promises.whenAny(*promises)
+}
+
 fun <T> promiseSuccess(value: T): Promise<T> {
     return Promises.success(value)
 }
