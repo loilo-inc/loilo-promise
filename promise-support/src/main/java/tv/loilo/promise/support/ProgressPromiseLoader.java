@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,10 @@
 
 package tv.loilo.promise.support;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 
 import tv.loilo.promise.Dispatcher;
@@ -26,32 +27,23 @@ import tv.loilo.promise.Promise;
 import tv.loilo.promise.Result;
 import tv.loilo.promise.Transfer;
 
-/**
- * Base class for android.support.v4.content.Loader for using tv.loilo.promise.Promise with the progress notification.
- *
- * @param <TFragment> the specified type of a implementation of {@link ProgressPromiseLoaderCallbacks}
- * @param <TData>     the specified type of a success value
- * @param <TProgress> the specified type of progress value
- */
-public abstract class ProgressPromiseLoader<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
-        extends PromiseLoader<TData> {
+public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoader<TData> {
 
     @Nullable
-    private TFragment mParentFragment;
+    private ProgressPromiseLoaderCallbacks<TData, TProgress> mLoaderCallbacks;
+
     @Nullable
     private TProgress mProgressCache;
 
-    public ProgressPromiseLoader(@NonNull TFragment fragment) {
-        super(fragment.getContext());
-        attachFragment(fragment);
+    public ProgressPromiseLoader(Context context) {
+        super(context);
     }
 
     @NonNull
-    public static <TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
-    ProgressPromiseLoader<TFragment, TData, TProgress> createLoader(
-            @NonNull TFragment fragment,
-            @NonNull final ProgressPromiseFactory<TFragment, TData, TProgress> promiseFactory) {
-        return new ProgressPromiseLoader<TFragment, TData, TProgress>(fragment) {
+    public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
+            Context context,
+            @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory) {
+        return new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
@@ -61,12 +53,11 @@ public abstract class ProgressPromiseLoader<TFragment extends Fragment & Progres
     }
 
     @NonNull
-    public static <TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
-    ProgressPromiseLoader<TFragment, TData, TProgress> createLoader(
-            @NonNull TFragment fragment,
-            @NonNull final ProgressPromiseFactory<TFragment, TData, TProgress> promiseFactory,
+    public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
+            Context context,
+            @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory,
             @Nullable final PromiseCacheCleaner<TData> dataCacheCleaner) {
-        return new ProgressPromiseLoader<TFragment, TData, TProgress>(fragment) {
+        return new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
@@ -82,38 +73,38 @@ public abstract class ProgressPromiseLoader<TFragment extends Fragment & Progres
         };
     }
 
-    public static <TLoader extends ProgressPromiseLoader<TFragment, TData, TProgress>, TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
-    void attachLoader(int id, @NonNull TFragment fragment) {
-        final Loader<Result<TData>> loader = fragment.getLoaderManager().getLoader(id);
+    public static <TData, TProgress> void attachProgressCallback(LoaderManager loaderManager, int id, @NonNull ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+        final Loader<Result<TData>> loader = loaderManager.getLoader(id);
         if (loader == null) {
             return;
         }
 
-        @SuppressWarnings("unchecked") final TLoader promiseLoader = (TLoader) loader;
-        promiseLoader.attachFragment(fragment);
+        @SuppressWarnings("unchecked") final ProgressPromiseLoader<TData, TProgress> promiseLoader = (ProgressPromiseLoader<TData, TProgress>) loader;
+        promiseLoader.attachLoaderCallbacks(loaderCallbacks);
     }
 
-    public static <TLoader extends ProgressPromiseLoader<TFragment, TData, TProgress>, TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress>
-    void detachLoader(int id, @NonNull TFragment fragment) {
-        final Loader<Result<TData>> loader = fragment.getLoaderManager().getLoader(id);
+    public static <TData, TProgress> void detachProgressCallback(LoaderManager loaderManager, int id, @NonNull ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+        final Loader<Result<TData>> loader = loaderManager.getLoader(id);
         if (loader == null) {
             return;
         }
 
-        @SuppressWarnings("unchecked") final TLoader promiseLoader = (TLoader) loader;
-        promiseLoader.detachFragment();
+        @SuppressWarnings("unchecked") final ProgressPromiseLoader<TData, TProgress> promiseLoader = (ProgressPromiseLoader<TData, TProgress>) loader;
+        promiseLoader.detachLoaderCallbacks(loaderCallbacks);
     }
 
-    void attachFragment(@NonNull TFragment fragment) {
-        if (fragment.isResumed() && fragment != mParentFragment) {
-            detachFragment();
-            mParentFragment = fragment;
+    private void attachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+        if (loaderCallbacks != mLoaderCallbacks) {
+            detachLoaderCallbacks(mLoaderCallbacks);
+            mLoaderCallbacks = loaderCallbacks;
             notifyProgress();
         }
     }
 
-    void detachFragment() {
-        mParentFragment = null;
+    private void detachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+        if (loaderCallbacks == mLoaderCallbacks) {
+            mLoaderCallbacks = null;
+        }
     }
 
     @Override
@@ -137,8 +128,8 @@ public abstract class ProgressPromiseLoader<TFragment extends Fragment & Progres
     }
 
     private void notifyProgress() {
-        if (mParentFragment != null && mProgressCache != null) {
-            mParentFragment.onLoaderProgress(getId(), mProgressCache);
+        if (mLoaderCallbacks != null && mProgressCache != null) {
+            mLoaderCallbacks.onLoaderProgress(getId(), mProgressCache);
         }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Parameters that are passed to {@link UntilCallback}.
  */
-public class UntilParams<T> extends ResultParams<T> {
+public final class UntilParams<T> extends ResultParams<T> {
 
     private final AtomicInteger mIndex;
 

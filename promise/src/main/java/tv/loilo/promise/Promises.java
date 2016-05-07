@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -34,6 +35,181 @@ public final class Promises {
     private static final ExecutorService mDefaultExecutorService = Executors.newCachedThreadPool();
 
     private Promises() {
+    }
+
+    @SafeVarargs
+    public static <TOut> Promise<Mashup<TOut>> whenAll(final Mashup<TOut> mashup, final Promise<TOut>... promises) {
+        return when(new WhenCallback<Mashup<TOut>>() {
+            @Override
+            public Deferred<Mashup<TOut>> run(WhenParams entryParams) throws Exception {
+
+                final int promiseCount = promises.length;
+                final AtomicInteger finishCount = new AtomicInteger();
+                final AtomicReference<Exception> exception = new AtomicReference<>();
+                final Scheduler scheduler = new Scheduler(1);
+
+                final Deferrable<Mashup<TOut>> deferrable = new Deferrable<>();
+                final ManualResetEvent prepared = new ManualResetEvent(false);
+                final Canceller[] cancellers = new Canceller[promiseCount];
+                final AtomicInteger successCount = new AtomicInteger();
+
+                try{
+                    for (int i = 0; i < promiseCount; ++i) {
+                        final Promise<TOut> promise = promises[i];
+                        final int capture = i;
+                        final Canceller canceller = Promises.when(new WhenCallback<TOut>() {
+                            @Override
+                            public Deferred<TOut> run(WhenParams params) throws Exception {
+                                prepared.await();
+                                return promise.get(params);
+                            }
+                        }).then(new ThenCallback<TOut, Void>() {
+                            @Override
+                            public Deferred<Void> run(final ThenParams<TOut> eachParams) throws Exception {
+                                return when(new WhenCallback<Void>() {
+                                    @Override
+                                    public Deferred<Void> run(WhenParams unused) throws Exception {
+                                        if (eachParams.getCancelToken().isCanceled()) {
+                                            return Defer.cancel();
+                                        }
+
+                                        final Exception e = eachParams.getException();
+                                        if (e != null) {
+                                            return Defer.fail(e);
+                                        }
+
+                                        if(mashup != null){
+                                            mashup.add(capture, eachParams.getValue());
+                                        }
+                                        successCount.incrementAndGet();
+                                        return Defer.success(null);
+                                    }
+                                }).getOn(scheduler, eachParams);
+                            }
+                        }).finish(new FinishCallback<Void>() {
+                            @Override
+                            public void run(FinishParams<Void> finishParams) {
+                                if (!finishParams.getCancelToken().isCanceled()) {
+                                    final Exception e = finishParams.getException();
+                                    if(e != null){
+                                        if (exception.compareAndSet(null, e)) {
+                                            for (int j = 0; j < promiseCount; ++j) {
+                                                if (j == capture) {
+                                                    continue;
+                                                }
+                                                final Canceller canceling = cancellers[j];
+                                                if(canceling != null){
+                                                    canceling.cancel();
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (finishCount.incrementAndGet() >= promiseCount) {
+                                    final Exception e = exception.get();
+                                    if (e != null) {
+                                        deferrable.setFailed(e);
+                                    } else {
+                                        if(successCount.get() >= promiseCount){
+                                            deferrable.setSucceeded(mashup);
+                                        } else {
+                                            deferrable.setCanceled();
+                                        }
+                                    }
+                                }
+                            }
+                        }).submit(entryParams.getTag());
+                        cancellers[i] = canceller;
+                    }
+                } finally {
+                    prepared.set();
+                }
+
+                deferrable.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() {
+                        for (Canceller canceller : cancellers) {
+                            canceller.cancel();
+                        }
+                    }
+                });
+
+                return deferrable;
+            }
+        });
+    }
+
+    @SafeVarargs
+    public static <TOut> Promise<TOut> whenAny(final Promise<TOut>... promises) {
+        return when(new WhenCallback<TOut>() {
+            @Override
+            public Deferred<TOut> run(WhenParams entryParams) throws Exception {
+
+                final int promiseCount = promises.length;
+                final AtomicInteger finishCount = new AtomicInteger();
+                final AtomicReference<Result<TOut>> result = new AtomicReference<>();
+
+                final Deferrable<TOut> deferrable = new Deferrable<>();
+                final ManualResetEvent prepared = new ManualResetEvent(false);
+                final Canceller[] cancellers = new Canceller[promiseCount];
+
+                try {
+                    for (int i = 0; i < promiseCount; ++i) {
+                        final Promise<TOut> promise = promises[i];
+                        final int capture = i;
+                        final Canceller canceller = Promises.when(new WhenCallback<TOut>() {
+                            @Override
+                            public Deferred<TOut> run(WhenParams params) throws Exception {
+                                prepared.await();
+                                return promise.get(params);
+                            }
+                        }).finish(new FinishCallback<TOut>() {
+                            @Override
+                            public void run(FinishParams<TOut> finishParams) {
+
+                                if(!finishParams.getCancelToken().isCanceled()){
+                                    if (result.compareAndSet(null, finishParams.asResult())) {
+                                        for (int j = 0; j < promiseCount; ++j) {
+                                            if (j == capture) {
+                                                continue;
+                                            }
+                                            final Canceller canceling = cancellers[j];
+                                            if(canceling != null){
+                                                canceling.cancel();
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (finishCount.incrementAndGet() >= promiseCount) {
+                                    final Result<TOut> ret = result.get();
+                                    if(ret != null){
+                                        deferrable.setResult(ret);
+                                    } else {
+                                        deferrable.setCanceled();
+                                    }
+                                }
+                            }
+                        }).submit(entryParams.getTag());
+                        cancellers[i] = canceller;
+                    }
+                } finally {
+                    prepared.set();
+                }
+
+                deferrable.setCancellable(new Cancellable() {
+                    @Override
+                    public void cancel() {
+                        for (Canceller canceller : cancellers) {
+                            canceller.cancel();
+                        }
+                    }
+                });
+
+                return deferrable;
+            }
+        });
     }
 
     /**

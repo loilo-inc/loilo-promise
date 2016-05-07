@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,12 +42,75 @@ import tv.loilo.promise.support.ProgressPromiseFactory;
 import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
 
-/**
- * Created by pepeotoito on 2015/12/26.
- */
-public class SampleProgressBarDialogFragment extends AppCompatDialogFragment implements ProgressPromiseLoaderCallbacks<Void, Integer> {
+public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
 
     private static final int LOADER_ID = 0;
+
+    private final ProgressPromiseLoaderCallbacks<Void, Integer> mLoaderCallbacks = new ProgressPromiseLoaderCallbacks<Void, Integer>() {
+        @Override
+        public void onLoaderProgress(int id, @NonNull Integer integer) {
+            final ProgressDialog progressDialog = (ProgressDialog) getDialog();
+            progressDialog.setProgress(integer);
+        }
+
+        @Override
+        public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
+            return ProgressPromiseLoader.createLoader(getContext(), new ProgressPromiseFactory<Void, Integer>() {
+                @NonNull
+                @Override
+                public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader<Void, Integer> loader) {
+                    return Promises.when(new WhenCallback<Void>() {
+                        @Override
+                        public Deferred<Void> run(WhenParams params) throws Exception {
+
+                            for (int i = 0; i < 100; ++i) {
+                                loader.reportProgress(new Transfer<>(params, i));
+                                TimeUnit.MILLISECONDS.sleep(100);
+                            }
+
+                            loader.reportProgress(new Transfer<>(params, 100));
+
+                            return Defer.success(null);
+                        }
+                    });
+                }
+            });
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Result<Void>> loader, final Result<Void> data) {
+            Dispatcher.getMainDispatcher().post(new Runnable() {
+                @Override
+                public void run() {
+
+                    if (isResumed()) {
+                        dismiss();
+
+                        final OnFinishedListener listener = resolveListener();
+
+                        if (listener != null) {
+                            if (data.getCancelToken().isCanceled()) {
+                                listener.onSampleProgressBarCanceled();
+                                return;
+                            }
+
+                            final Exception e = data.getException();
+                            if (e != null) {
+                                listener.onSampleProgressBarFailed(e);
+                            } else {
+                                listener.onSampleProgressBarSucceeded();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Result<Void>> loader) {
+
+        }
+    };
 
     @NonNull
     @Override
@@ -69,7 +132,7 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment imp
         super.onActivityCreated(savedInstanceState);
 
         getDialog().setCancelable(false);
-        getLoaderManager().initLoader(LOADER_ID, Bundle.EMPTY, this);
+        getLoaderManager().initLoader(LOADER_ID, Bundle.EMPTY, mLoaderCallbacks);
     }
 
     @Override
@@ -83,85 +146,15 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment imp
                 ProgressPromiseLoader.cancelLoader(getLoaderManager(), LOADER_ID);
             }
         });
+
+        ProgressPromiseLoader.attachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStop() {
+        super.onStop();
 
-        ProgressPromiseLoader.attachLoader(LOADER_ID, this);
-    }
-
-    @Override
-    public void onPause() {
-        ProgressPromiseLoader.detachLoader(LOADER_ID, this);
-
-        super.onPause();
-    }
-
-    @Override
-    public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
-        return ProgressPromiseLoader.createLoader(this, new ProgressPromiseFactory<SampleProgressBarDialogFragment, Void, Integer>() {
-            @NonNull
-            @Override
-            public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader<SampleProgressBarDialogFragment, Void, Integer> loader) {
-                return Promises.when(new WhenCallback<Void>() {
-                    @Override
-                    public Deferred<Void> run(WhenParams params) throws Exception {
-
-                        for (int i = 0; i < 100; ++i) {
-                            loader.reportProgress(new Transfer<>(params, i));
-                            TimeUnit.MILLISECONDS.sleep(100);
-                        }
-
-                        loader.reportProgress(new Transfer<>(params, 100));
-
-                        return Defer.success(null);
-                    }
-                });
-            }
-        });
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Result<Void>> loader, final Result<Void> data) {
-        Dispatcher.getMainDispatcher().post(new Runnable() {
-            @Override
-            public void run() {
-
-                if (isResumed()) {
-                    dismiss();
-
-                    final OnFinishedListener listener = resolveListener();
-
-                    if (listener != null) {
-                        if (data.getCancelToken().isCanceled()) {
-                            listener.onSampleProgressBarCanceled();
-                            return;
-                        }
-
-                        final Exception e = data.getException();
-                        if (e != null) {
-                            listener.onSampleProgressBarFailed(e);
-                        } else {
-                            listener.onSampleProgressBarSucceeded();
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Result<Void>> loader) {
-
-    }
-
-    @Override
-    public void onLoaderProgress(int id, @NonNull Integer progress) {
-
-        final ProgressDialog progressDialog = (ProgressDialog) getDialog();
-        progressDialog.setProgress(progress);
+        ProgressPromiseLoader.detachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
     }
 
     private OnFinishedListener resolveListener() {

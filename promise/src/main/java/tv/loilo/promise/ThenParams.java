@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link ThenCallback}
  */
-public class ThenParams<TOut> extends ResultParams<TOut> {
+public final class ThenParams<TOut> extends ResultParams<TOut> {
     public ThenParams(Result<TOut> result, CloseableStack scope, Object tag) {
         super(result, scope, tag);
     }

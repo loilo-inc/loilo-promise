@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package tv.loilo.promise;
  * Class for the data transfer.
  * Uses in progress notification, etc.
  */
-public class Transfer<TData> implements TaggedCancelState {
+public final class Transfer<TData> implements TaggedCancelState {
 
     final Object mTag;
     private final CancelToken mCancelToken;

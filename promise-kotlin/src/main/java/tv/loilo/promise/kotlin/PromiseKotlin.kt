@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,18 @@ fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T, Unit>) -> Deferred
 
 fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachParams<TIn, TOut>) -> Deferred<ForEachOp>): Promise<TOut> {
     return Promises.forEach(ite, operand, f)
+}
+
+fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<Unit> {
+    return Promises.whenAll(null, promises).exchange(Unit)
+}
+
+fun <T> promiseWhenAll(mashup: (Int, T) -> Unit, vararg promises: Promise<T>): Promise<Unit> {
+    return Promises.whenAll(mashup, promises).exchange(Unit)
+}
+
+fun <T> promiseWhenAny(vararg promises: Promise<T>): Promise<T> {
+    return Promises.whenAny(*promises)
 }
 
 fun <T> promiseSuccess(value: T): Promise<T> {

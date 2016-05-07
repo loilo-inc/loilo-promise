@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Parameters that are passed to {@link ForEachCallback}.
  */
-public class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
+public final class ForEachParams<TValue, TOperand> extends SuccessParams<TValue> {
     private final AtomicInteger mIndex;
     private final TOperand mOperand;
 

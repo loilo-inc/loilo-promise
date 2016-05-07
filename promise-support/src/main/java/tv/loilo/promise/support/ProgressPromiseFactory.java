@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,18 +17,10 @@
 package tv.loilo.promise.support;
 
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 
 import tv.loilo.promise.Promise;
 
-/**
- * Interface for the creation of tv.loilo.promise.Promise.
- *
- * @param <TFragment> the specified type of a implementation of {@link ProgressPromiseLoaderCallbacks}
- * @param <TData>     the specified type of a success value
- * @param <TProgress> the specified type of progress value
- */
-public interface ProgressPromiseFactory<TFragment extends Fragment & ProgressPromiseLoaderCallbacks<TData, TProgress>, TData, TProgress> {
+public interface ProgressPromiseFactory<TData, TProgress> {
     @NonNull
-    Promise<TData> createPromise(@NonNull ProgressPromiseLoader<TFragment, TData, TProgress> loader);
+    Promise<TData> createPromise(@NonNull ProgressPromiseLoader<TData, TProgress> loader);
 }

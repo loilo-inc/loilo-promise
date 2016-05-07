@@ -1,1 +1,1 @@
-include ':promise', ':promise-kotlin', ':promise-support', ':promise-samples-progress', ':promise-support-kotlin', ':promise-samples-progress-kotlin', ':promise-samples-errorhandling', ':promise-uitest-kotlin'
+include ':promise', ':promise-kotlin', ':promise-support', ':promise-samples-progress', ':promise-support-kotlin', ':promise-samples-progress-kotlin', ':promise-samples-errorhandling', ':promise-uitest-kotlin', ':promise-http', ':promise-samples-http'

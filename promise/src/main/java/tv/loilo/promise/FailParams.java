@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package tv.loilo.promise;
 /**
  * Parameters that are passed to {@link FailCallback}.
  */
-public class FailParams<T> implements ExecutionContext {
+public final class FailParams<T> implements ExecutionContext {
     private final Exception mException;
     private final CancelToken mCancelToken;
     private final CloseableStack mScope;

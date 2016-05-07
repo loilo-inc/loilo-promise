@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,16 @@ package tv.loilo.promise;
  */
 public final class CancelTokens {
 
-    static final CancelToken CANCELED = new StaticCancelToken(true);
-    static final CancelToken NONE = new StaticCancelToken(false);
+    /**
+     * The token that is always canceled.
+     */
+    public static final CancelToken CANCELED = new StaticCancelToken(true);
+
+    /**
+     * The token that is always not canceled.
+     */
+    public static final CancelToken NONE = new StaticCancelToken(false);
+
     private CancelTokens() {
     }
 

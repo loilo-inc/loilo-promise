@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import android.os.Looper;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-public class MessageLoop {
+public final class MessageLoop {
 
     @SuppressWarnings({"FieldCanBeLocal", "unused"})
     private final Thread mThread;

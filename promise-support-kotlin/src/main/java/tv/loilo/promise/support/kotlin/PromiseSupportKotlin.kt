@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 LoiLo inc.
+ * Copyright (c) 2015-2016 LoiLo inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package tv.loilo.promise.support.kotlin
 
 import android.content.Context
-import android.support.v4.app.Fragment
 import android.support.v4.app.LoaderManager
 import tv.loilo.promise.Promise
 import tv.loilo.promise.support.ProgressPromiseLoader
@@ -43,20 +42,18 @@ fun <TData> createPromiseLoader(
     }
 }
 
-fun <TFragment, TData, TProgress> createProgressPromiseLoader(
-        fragment: TFragment,
-        createPromise: (ProgressPromiseLoader<TFragment, TData, TProgress>) -> Promise<TData>,
-        clearDataCache: ((TData) -> Unit)? = null): ProgressPromiseLoader<TFragment, TData, TProgress>
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress> {
-    return ProgressPromiseLoader.createLoader(fragment, createPromise, clearDataCache)
+fun <TData, TProgress> createProgressPromiseLoader(
+        context: Context,
+        createPromise: (ProgressPromiseLoader<TData, TProgress>) -> Promise<TData>,
+        clearDataCache: ((TData) -> Unit)? = null)
+        : ProgressPromiseLoader<TData, TProgress> {
+    return ProgressPromiseLoader.createLoader(context, createPromise, clearDataCache)
 }
 
-fun <TLoader, TFragment, TData, TProgress> attachProgressPromiseLoader(id: Int, fragment: TFragment)
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
-    ProgressPromiseLoader.attachLoader(id, fragment)
+fun <TData, TProgress> LoaderManager.attachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
+    ProgressPromiseLoader.attachProgressCallback(this, id, loaderCallbacks)
 }
 
-fun <TLoader, TFragment, TData, TProgress> detachProgressPromiseLoader(id: Int, fragment: TFragment)
-        where TFragment : Fragment, TFragment : ProgressPromiseLoaderCallbacks<TData, TProgress>, TLoader : ProgressPromiseLoader<TFragment, TData, TProgress> {
-    ProgressPromiseLoader.detachLoader(id, fragment)
+fun <TData, TProgress> LoaderManager.detachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
+    ProgressPromiseLoader.detachProgressCallback(this, id, loaderCallbacks);
 }
