@@ -18,8 +18,8 @@ via Gradle
 
 ```groovy
 dependencies {
-    compile 'tv.loilo.promise:promise:0.2.0'
-    compile 'tv.loilo.promise:promise-support:0.2.0'
+    compile 'tv.loilo.promise:promise:0.4.0'
+    compile 'tv.loilo.promise:promise-support:0.4.0'
 }
 ```
 
@@ -561,7 +561,7 @@ See the following sample code.
 
 ## License
 
-    Copyright 2015 LoiLo inc.
+    Copyright 2015-2016 LoiLo inc.
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
