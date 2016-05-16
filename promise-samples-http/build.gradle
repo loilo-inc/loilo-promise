@@ -25,9 +25,9 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
+    compile "com.android.support:appcompat-v7:${android_support_version}"
     compile project(':promise')
     compile project(':promise-support')
     compile project(':promise-http')
-    compile 'com.android.support:recyclerview-v7:23.3.0'
+    compile "com.android.support:recyclerview-v7:${android_support_version}"
 }

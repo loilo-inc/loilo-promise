@@ -44,10 +44,12 @@ fun <TData> createPromiseLoader(
 
 fun <TData, TProgress> createProgressPromiseLoader(
         context: Context,
+        loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>,
+        shouldAttachProgressCallback: Boolean,
         createPromise: (ProgressPromiseLoader<TData, TProgress>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null)
         : ProgressPromiseLoader<TData, TProgress> {
-    return ProgressPromiseLoader.createLoader(context, createPromise, clearDataCache)
+    return ProgressPromiseLoader.createLoader(context, loaderCallbacks, shouldAttachProgressCallback, createPromise, clearDataCache)
 }
 
 fun <TData, TProgress> LoaderManager.attachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {

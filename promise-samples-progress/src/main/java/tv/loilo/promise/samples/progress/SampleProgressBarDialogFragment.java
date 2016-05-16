@@ -45,6 +45,7 @@ import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
 public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
 
     private static final int LOADER_ID = 0;
+    private boolean mIsStarted = false;
 
     private final ProgressPromiseLoaderCallbacks<Void, Integer> mLoaderCallbacks = new ProgressPromiseLoaderCallbacks<Void, Integer>() {
         @Override
@@ -55,7 +56,7 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
 
         @Override
         public Loader<Result<Void>> onCreateLoader(int id, Bundle args) {
-            return ProgressPromiseLoader.createLoader(getContext(), new ProgressPromiseFactory<Void, Integer>() {
+            return ProgressPromiseLoader.createLoader(getContext(), this, mIsStarted, new ProgressPromiseFactory<Void, Integer>() {
                 @NonNull
                 @Override
                 public Promise<Void> createPromise(@NonNull final ProgressPromiseLoader<Void, Integer> loader) {
@@ -138,6 +139,7 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
     @Override
     public void onStart() {
         super.onStart();
+        mIsStarted = true;
 
         final ProgressDialog progressDialog = (ProgressDialog) getDialog();
         progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setOnClickListener(new View.OnClickListener() {
@@ -153,7 +155,7 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
     @Override
     public void onStop() {
         super.onStop();
-
+        mIsStarted = false;
         ProgressPromiseLoader.detachProgressCallback(getLoaderManager(), LOADER_ID, mLoaderCallbacks);
     }
 

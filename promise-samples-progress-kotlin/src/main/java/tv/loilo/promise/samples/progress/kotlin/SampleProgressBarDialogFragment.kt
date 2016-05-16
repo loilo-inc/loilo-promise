@@ -40,13 +40,15 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
         val LOADER_ID = 0
     }
 
+    private var isStarted: Boolean = false
+
     private var loaderCallbacks = object : ProgressPromiseLoaderCallbacks<Unit, Int> {
         override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
 
         }
 
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createProgressPromiseLoader<Unit, Int>(context, { loader ->
+            return createProgressPromiseLoader(context, this, isStarted, { loader ->
                 promiseWhen {
                     defer {
                         for (i in 0..99) {
@@ -103,7 +105,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
 
     override fun onStart() {
         super.onStart()
-
+        isStarted = true
         val progressDialog = dialog as? ProgressDialog
         progressDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.setOnClickListener {
             loaderManager.cancelLoader(LOADER_ID)
@@ -114,7 +116,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
 
     override fun onStop() {
         super.onStop()
-
+        isStarted = false
         loaderManager.detachProgressCallback(LOADER_ID, loaderCallbacks)
     }
 
