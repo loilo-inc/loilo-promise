@@ -42,22 +42,33 @@ public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoa
     @NonNull
     public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
             Context context,
+            @NonNull ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks,
+            boolean shouldAttachProgressCallback,
             @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory) {
-        return new ProgressPromiseLoader<TData, TProgress>(context) {
+
+        final ProgressPromiseLoader<TData, TProgress> loader = new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
                 return promiseFactory.createPromise(this);
             }
         };
+
+        if (shouldAttachProgressCallback) {
+            loader.attachLoaderCallbacks(loaderCallbacks);
+        }
+        return loader;
     }
 
     @NonNull
     public static <TData, TProgress> ProgressPromiseLoader<TData, TProgress> createLoader(
             Context context,
+            @NonNull ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks,
+            boolean shouldAttachProgressCallback,
             @NonNull final ProgressPromiseFactory<TData, TProgress> promiseFactory,
             @Nullable final PromiseCacheCleaner<TData> dataCacheCleaner) {
-        return new ProgressPromiseLoader<TData, TProgress>(context) {
+
+        final ProgressPromiseLoader<TData, TProgress> loader = new ProgressPromiseLoader<TData, TProgress>(context) {
             @NonNull
             @Override
             protected Promise<TData> onCreatePromise() throws Exception {
@@ -71,6 +82,10 @@ public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoa
                 }
             }
         };
+        if (shouldAttachProgressCallback) {
+            loader.attachLoaderCallbacks(loaderCallbacks);
+        }
+        return loader;
     }
 
     public static <TData, TProgress> void attachProgressCallback(LoaderManager loaderManager, int id, @NonNull ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
@@ -93,7 +108,7 @@ public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoa
         promiseLoader.detachLoaderCallbacks(loaderCallbacks);
     }
 
-    private void attachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+    public void attachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
         if (loaderCallbacks != mLoaderCallbacks) {
             detachLoaderCallbacks(mLoaderCallbacks);
             mLoaderCallbacks = loaderCallbacks;
@@ -101,7 +116,7 @@ public abstract class ProgressPromiseLoader<TData, TProgress> extends PromiseLoa
         }
     }
 
-    private void detachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
+    public void detachLoaderCallbacks(ProgressPromiseLoaderCallbacks<TData, TProgress> loaderCallbacks) {
         if (loaderCallbacks == mLoaderCallbacks) {
             mLoaderCallbacks = null;
         }

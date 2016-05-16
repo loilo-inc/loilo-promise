@@ -26,20 +26,19 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:23.3.0'
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile "com.android.support:appcompat-v7:${android_support_version}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile project(':promise')
     compile project(':promise-kotlin')
     compile project(':promise-support')
     compile project(':promise-support-kotlin')
 }
 buildscript {
-    ext.kotlin_version = '1.0.1-2'
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
     }
 }
 repositories {

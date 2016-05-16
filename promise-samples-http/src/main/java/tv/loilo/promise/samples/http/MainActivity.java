@@ -59,6 +59,8 @@ import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean mIsStarted;
+
     private final ProgressPromiseLoaderCallbacks<List<String>, HttpProgress> mLoaderCallbacks = new ProgressPromiseLoaderCallbacks<List<String>, HttpProgress>() {
         @Override
         public void onLoaderProgress(int id, @NonNull HttpProgress httpProgress) {
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Loader<Result<List<String>>> onCreateLoader(int id, Bundle args) {
-            return ProgressPromiseLoader.createLoader(MainActivity.this, new ProgressPromiseFactory<List<String>, HttpProgress>() {
+            return ProgressPromiseLoader.createLoader(MainActivity.this, this, mIsStarted, new ProgressPromiseFactory<List<String>, HttpProgress>() {
                 @NonNull
                 @Override
                 public Promise<List<String>> createPromise(@NonNull final ProgressPromiseLoader<List<String>, HttpProgress> loader) {
@@ -78,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public Deferred<ResponseAs<JsonArray>> run(final WhenParams params) throws Exception {
                             final OkHttpClient client = new OkHttpClient();
-                            final Request req = new Request.Builder().url("https://raw.githubusercontent.com/loilo-inc/loilo-promise/withOkhttp/promise-samples-http/src/androidTest/assets/sample.json").get().build();
+                            final Request req = new Request.Builder().url("https://raw.githubusercontent.com/loilo-inc/loilo-promise/master/promise-samples-http/src/androidTest/assets/sample.json").get().build();
                             final Call call = client.newCall(req);
                             return new HttpTask(call).asJsonArray().progress(new ProgressReporter<HttpProgress>() {
                                 @Override
@@ -108,12 +110,12 @@ public class MainActivity extends AppCompatActivity {
             Dispatcher.getMainDispatcher().post(new Runnable() {
                 @Override
                 public void run() {
-                    if(data.getCancelToken().isCanceled()){
+                    if (data.getCancelToken().isCanceled()) {
                         return;
                     }
 
                     @SuppressWarnings("ThrowableResultOfMethodCallIgnored") final Exception e = data.getException();
-                    if(e != null){
+                    if (e != null) {
                         Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         return;
                     }
@@ -150,25 +152,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-
+        mIsStarted = true;
         ProgressPromiseLoader.attachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-
+        mIsStarted = false;
         ProgressPromiseLoader.detachProgressCallback(getSupportLoaderManager(), 0, mLoaderCallbacks);
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         public ViewHolder(View itemView) {
             super(itemView);
         }
     }
 
-    class Adapter extends RecyclerView.Adapter<ViewHolder>{
+    class Adapter extends RecyclerView.Adapter<ViewHolder> {
 
         private List<String> mList = new ArrayList<>();
 
@@ -188,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
             return mList.size();
         }
 
-        public void load(List<String> list){
+        public void load(List<String> list) {
             mList = list;
             notifyDataSetChanged();
         }
