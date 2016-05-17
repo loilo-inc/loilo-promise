@@ -15,3 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+#OkHttp http://qiita.com/tsuyosh/items/9dd3c6b9dc11b5f640be
+# https://github.com/square/okio/issues/58
+-dontwarn java.nio.file.*
+-dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
