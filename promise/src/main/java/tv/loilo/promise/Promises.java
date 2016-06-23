@@ -325,7 +325,7 @@ public final class Promises {
 
                                 scope.attach(new ArrayCloseableStack());
 
-                                Deferred<TOut> deferred;
+                                Deferred<TOut> deferred = null;
                                 if (params.getCancelToken().isCanceled()) {
                                     deferred = Defer.cancel();
                                 } else {
@@ -338,6 +338,10 @@ public final class Promises {
                                         deferred = Defer.cancel();
                                     } catch (final Exception e) {
                                         deferred = Defer.fail(e);
+                                    } finally {
+                                        if (deferred == null) {
+                                            deferred = Defer.fail(new NullDeferredException("RepeatCallback returned null"));
+                                        }
                                     }
                                 }
 
@@ -585,7 +589,7 @@ public final class Promises {
 
         @Override
         public void execute(final Result<TIn> input, final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
-            Deferred<TOut> deferred;
+            Deferred<TOut> deferred = null;
             try {
                 deferred = mThenCallback.run(new ThenParams<>(input, scope, tag));
             } catch (final InterruptedException e) {
@@ -595,6 +599,10 @@ public final class Promises {
                 deferred = Defer.cancel();
             } catch (final Exception e) {
                 deferred = Defer.fail(e);
+            } finally {
+                if (deferred == null) {
+                    deferred = Defer.fail(new NullDeferredException("ThenCallback returned null"));
+                }
             }
 
             final Result<TOut> output = Results.exchangeCancelToken(deferred.getResult(), cancelToken);
@@ -792,7 +800,7 @@ public final class Promises {
         @Override
         public void execute(final CancelToken cancelToken, final CloseableStack scope, final Object tag) {
 
-            Deferred<TOut> handle;
+            Deferred<TOut> handle = null;
             //Do not call the initial callback when Promise was already canceled.
             if (cancelToken.isCanceled()) {
                 handle = Defer.cancel();
@@ -806,6 +814,10 @@ public final class Promises {
                     handle = Defer.cancel();
                 } catch (final Exception e) {
                     handle = Defer.fail(e);
+                } finally {
+                    if (handle == null) {
+                        handle = Defer.fail(new NullDeferredException("WhenCallback returned null"));
+                    }
                 }
             }
 
