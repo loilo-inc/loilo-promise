@@ -16,9 +16,10 @@
 
 package tv.loilo.promise;
 
-import android.test.AndroidTestCase;
+import android.support.test.runner.AndroidJUnit4;
 
-import junit.framework.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class PromisesTest extends AndroidTestCase {
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 
+@RunWith(AndroidJUnit4.class)
+public class PromisesTest {
+
+    @Test
     public void testWhen() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -49,6 +57,7 @@ public class PromisesTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    @Test
     public void testThrowException() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -67,6 +76,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().getException().getMessage());
     }
 
+    @Test
     public void testCancellableWhenSleep() throws Exception {
 
         final Deferrable<String> deferrable = new Deferrable<>();
@@ -94,6 +104,7 @@ public class PromisesTest extends AndroidTestCase {
         assertTrue(deferrable.getResult().getCancelToken().isCanceled());
     }
 
+    @Test
     public void testCancellableWhenNotRunningFuture() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -137,6 +148,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testCallSucceeded() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -161,6 +173,7 @@ public class PromisesTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    @Test
     public void testNotCallSucceededWhenFailed() throws InterruptedException {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -184,6 +197,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().getException().getMessage());
     }
 
+    @Test
     public void testNotCallSucceededWhenCanceled() throws InterruptedException {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -209,6 +223,7 @@ public class PromisesTest extends AndroidTestCase {
         assertNull(deferrable.getResult().getException());
     }
 
+    @Test
     public void testCallFailed() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -232,6 +247,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testNotCallFailedWhenSucceeded() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -255,6 +271,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testNotCallFailedWhenCanceled() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -280,6 +297,7 @@ public class PromisesTest extends AndroidTestCase {
         assertNull(deferrable.getResult().getException());
     }
 
+    @Test
     public void testCallWatchWhenSucceeded() throws Exception {
 
         final AtomicInteger count = new AtomicInteger();
@@ -311,6 +329,7 @@ public class PromisesTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    @Test
     public void testCallWatchWhenFailed() throws InterruptedException {
 
         final AtomicInteger count = new AtomicInteger();
@@ -342,6 +361,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(1, count.get());
     }
 
+    @Test
     public void testCallWatchWhenCanceled() throws InterruptedException {
 
         final AtomicInteger count = new AtomicInteger();
@@ -375,6 +395,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(1, count.get());
     }
 
+    @Test
     public void testThenSucceeded() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -400,6 +421,7 @@ public class PromisesTest extends AndroidTestCase {
     }
 
     @SuppressWarnings("ThrowableResultOfMethodCallIgnored")
+    @Test
     public void testThenFailed() {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -431,6 +453,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().getException().getMessage());
     }
 
+    @Test
     public void testThenCanceled() {
         final Deferrable<String> deferrable = new Deferrable<>();
         final AtomicInteger count = new AtomicInteger();
@@ -461,6 +484,7 @@ public class PromisesTest extends AndroidTestCase {
         assertNull(deferrable.getResult().getException());
     }
 
+    @Test
     public void testCallPromiseOnPromise() throws Exception {
 
         final Deferrable<String> deferrable = new Deferrable<>();
@@ -485,6 +509,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testPromiseGetOn() throws Exception {
 
         final Deferrable<String> deferrable = new Deferrable<>();
@@ -518,6 +543,7 @@ public class PromisesTest extends AndroidTestCase {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 
+    @Test
     public void testPromiseOn() throws Exception {
 
         final Deferrable<String> deferrable = new Deferrable<>();
@@ -551,6 +577,7 @@ public class PromisesTest extends AndroidTestCase {
         executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
     }
 
+    @Test
     public void testRepeat() throws Exception {
 
         final Deferrable<Integer> deferrable = new Deferrable<>();
@@ -577,6 +604,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(2, deferrable.getResult().safeGetValue().intValue());
     }
 
+    @Test
     public void testForEach() throws Exception {
 
         final Deferrable<AtomicInteger> deferrable = new Deferrable<>();
@@ -602,6 +630,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(1 + 2 + 3, deferrable.getResult().safeGetValue().get());
     }
 
+    @Test
     public void testForEachBreak() throws Exception {
 
         final Deferrable<AtomicInteger> deferrable = new Deferrable<>();
@@ -630,6 +659,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(1 + 2, deferrable.getResult().safeGetValue().get());
     }
 
+    @Test
     public void testExchange() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -648,6 +678,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testSchedule() throws Exception {
         final Deferrable<String> deferrable = new Deferrable<>();
 
@@ -668,6 +699,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise", deferrable.getResult().safeGetValue());
     }
 
+    @Test
     public void testSerialExecuting() throws Exception {
 
         final Scheduler scheduler = new Scheduler(1);
@@ -712,6 +744,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("Hello Promise 2", deferrable2.getResult().safeGetValue());
     }
 
+    @Test
     public void testGetOnScheduler() throws Exception {
         final Scheduler scheduler = new Scheduler(1);
         final Deferrable<Integer> deferrable = new Deferrable<>();
@@ -735,6 +768,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(616, deferrable.getResult().safeGetValue().intValue());
     }
 
+    @Test
     public void testPromiseOnScheduler() throws Exception {
         final Scheduler scheduler = new Scheduler(1);
         final Deferrable<Integer> deferrable = new Deferrable<>();
@@ -758,6 +792,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals(616, deferrable.getResult().safeGetValue().intValue());
     }
 
+    @Test
     public void testWhenAll() throws Exception {
 
         final Deferrable<Mashup<String>> deferrable = new Deferrable<>();
@@ -792,6 +827,7 @@ public class PromisesTest extends AndroidTestCase {
         assertEquals("B", results[1]);
     }
 
+    @Test
     public void testWhenAny() throws Exception {
         final ManualResetEvent noSignal = new ManualResetEvent(false);
         final ManualResetEvent aborted = new ManualResetEvent(false);
@@ -820,9 +856,9 @@ public class PromisesTest extends AndroidTestCase {
         }).submit();
 
         final String value = deferrable.getResult().safeGetValue();
-        Assert.assertEquals("A", value);
+        assertEquals("A", value);
 
-        Assert.assertTrue(aborted.await(20, TimeUnit.SECONDS));
+        assertTrue(aborted.await(20, TimeUnit.SECONDS));
 
     }
 }
