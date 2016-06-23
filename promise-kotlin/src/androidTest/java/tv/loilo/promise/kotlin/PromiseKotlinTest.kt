@@ -16,7 +16,9 @@
 
 package tv.loilo.promise.kotlin
 
-import android.test.AndroidTestCase
+import android.support.test.runner.AndroidJUnit4
+import org.junit.Test
+import org.junit.runner.RunWith
 import tv.loilo.promise.*
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -24,11 +26,14 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-/**
- * Created by pepeotoito on 2015/12/27.
- */
-class PromiseKotlinTest : AndroidTestCase() {
+import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertNull
+import junit.framework.Assert.assertTrue
 
+@RunWith(AndroidJUnit4::class)
+class PromiseKotlinTest {
+
+    @Test
     fun testWhen() {
         val deferrable = Deferrable<String>()
 
@@ -41,6 +46,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testThrowException() {
         val deferrable = Deferrable<Unit>()
 
@@ -53,6 +59,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.exception.message)
     }
 
+    @Test
     fun testCancellableWhenSleep() {
 
         val deferrable = Deferrable<Unit>()
@@ -76,6 +83,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertTrue(deferrable.result.cancelToken.isCanceled)
     }
 
+    @Test
     fun testCancellableWhenNotRunningFuture() {
         val deferrable = Deferrable<String>()
 
@@ -106,6 +114,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testCallSucceeded() {
         val deferrable = Deferrable<String>()
 
@@ -120,6 +129,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testNotCallSucceededWhenFailed() {
         val deferrable = Deferrable<Unit>()
 
@@ -134,6 +144,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.exception.message)
     }
 
+    @Test
     fun testNotCallSucceededWhenCanceled() {
         val deferrable = Deferrable<Unit>()
 
@@ -152,6 +163,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertNull(deferrable.result.exception)
     }
 
+    @Test
     fun testCallFailed() {
         val deferrable = Deferrable<String>()
 
@@ -166,6 +178,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testNotCallFailedWhenSucceeded() {
         val deferrable = Deferrable<String>()
 
@@ -180,6 +193,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testNotCallFailedWhenCanceled() {
         val deferrable = Deferrable<Unit>()
 
@@ -198,6 +212,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertNull(deferrable.result.exception)
     }
 
+    @Test
     fun testCallWatchWhenSucceeded() {
 
         val count = AtomicInteger()
@@ -219,6 +234,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1, count.get())
     }
 
+    @Test
     fun testCallWatchWhenFailed() {
 
         val count = AtomicInteger()
@@ -240,6 +256,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1, count.get())
     }
 
+    @Test
     fun testCallWatchWhenCanceled() {
 
         val count = AtomicInteger()
@@ -265,6 +282,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1, count.get())
     }
 
+    @Test
     fun testThenSucceeded() {
         val deferrable = Deferrable<String>()
 
@@ -279,6 +297,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testThenFailed() {
         val deferrable = Deferrable<Unit>()
 
@@ -298,6 +317,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.exception.message)
     }
 
+    @Test
     fun testThenCanceled() {
         val deferrable = Deferrable<Unit>()
         val count = AtomicInteger()
@@ -322,6 +342,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertNull(deferrable.result.exception)
     }
 
+    @Test
     fun testCallPromiseOnPromise() {
 
         val deferrable = Deferrable<String>()
@@ -337,6 +358,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testPromiseGetOn() {
 
         val deferrable = Deferrable<String>()
@@ -363,6 +385,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         executor.awaitTermination(java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
     }
 
+    @Test
     fun testPromiseOn() {
 
         val deferrable = Deferrable<String>()
@@ -389,6 +412,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         executor.awaitTermination(java.lang.Long.MAX_VALUE, TimeUnit.NANOSECONDS)
     }
 
+    @Test
     fun testRepeat() {
 
         val deferrable = Deferrable<Int>()
@@ -406,6 +430,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(2, deferrable.result.safeGetValue().toInt())
     }
 
+    @Test
     fun testForEach() {
 
         val deferrable = Deferrable<AtomicInteger>()
@@ -427,6 +452,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1 + 2 + 3, deferrable.result.safeGetValue().get())
     }
 
+    @Test
     fun testForEachBreak() {
 
         val deferrable = Deferrable<AtomicInteger>()
@@ -452,6 +478,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1 + 2, deferrable.result.safeGetValue().get())
     }
 
+    @Test
     fun testForEachWithoutOperand() {
         val deferrable = Deferrable<Unit>()
 
@@ -480,6 +507,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals(1 + 2, sum.get())
     }
 
+    @Test
     fun testPromiseSuccess() {
         val deferrable = Deferrable<Boolean>()
         promiseSuccess(true).finish {
@@ -489,6 +517,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertTrue(deferrable.result.safeGetValue())
     }
 
+    @Test
     fun testPromiseFail() {
         val deferrable = Deferrable<Unit>()
         promiseFail<Unit>(Exception("Hello Promise")).finish {
@@ -498,6 +527,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferrable.result.exception.message)
     }
 
+    @Test
     fun testPromiseCancel() {
         val deferrable = Deferrable<Unit>()
         promiseCancel<Unit>().finish {
@@ -508,6 +538,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertNull(deferrable.result.exception)
     }
 
+    @Test
     fun testPromiseNotImpl() {
         val deferrable = Deferrable<Unit>()
         promiseNotImpl<Unit>().finish {
@@ -518,26 +549,31 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Not implemented.", deferrable.result.exception.message)
     }
 
+    @Test
     fun testDeferSuccess() {
         assertTrue(deferSuccess(true).result.safeGetValue())
     }
 
+    @Test
     fun testDeferFail() {
         assertEquals("Hello Promise", deferFail<Unit>(Exception("Hello Promise")).result.exception.message)
     }
 
+    @Test
     fun testDeferCancel() {
         val deferred = deferCancel<Unit>()
         assertTrue(deferred.result.cancelToken.isCanceled)
         assertNull(deferred.result.exception)
     }
 
+    @Test
     fun testDeferNotImpl() {
         val deferred = deferNotImpl<Unit>()
         assertTrue(deferred.result.exception is UnsupportedOperationException)
         assertEquals("Not implemented.", deferred.result.exception.message)
     }
 
+    @Test
     fun testDeferrableSuccess() {
         val deferred = deferrable<Boolean> {
             it.setSucceeded(true)
@@ -545,6 +581,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertTrue(deferred.result.safeGetValue())
     }
 
+    @Test
     fun testDeferrableFail() {
         val deferred = deferrable<Unit> {
             it.setFailed(Exception("Hello Promise"))
@@ -553,6 +590,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertEquals("Hello Promise", deferred.result.exception.message)
     }
 
+    @Test
     fun testDeferrableCanceled() {
         val deferred = deferrable<Unit> {
             it.setCanceled()
@@ -562,6 +600,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         assertNull(deferred.result.exception)
     }
 
+    @Test
     fun testResultWhenSucceeded() {
         Results.success(true).whenSucceeded {
             assertTrue(it)
@@ -594,6 +633,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         })
     }
 
+    @Test
     fun testResultWhenFailed() {
         Results.success(true).whenFailed {
             throw UnsupportedOperationException()
@@ -626,6 +666,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         })
     }
 
+    @Test
     fun testResultParamsWhenSucceeded() {
         ResultParams(Results.success(true), ArrayCloseableStack(), null).whenSucceeded {
             assertTrue(it)
@@ -658,6 +699,7 @@ class PromiseKotlinTest : AndroidTestCase() {
         })
     }
 
+    @Test
     fun testResultParamsWhenFailed() {
         ResultParams(Results.success(true), ArrayCloseableStack(), null).whenFailed {
             throw UnsupportedOperationException()
