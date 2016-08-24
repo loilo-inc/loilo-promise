@@ -16,6 +16,7 @@
 
 package tv.loilo.promise;
 
+@Deprecated
 public interface Mashup<TIn> {
     void add(int index, TIn input);
 }

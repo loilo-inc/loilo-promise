@@ -39,7 +39,6 @@ public final class ResponseNoBody implements ResponseFilter<ResponseUnit> {
         if (!mAllowErrorCode) {
             HttpUtils.ensureSuccessStatusCode(response);
         }
-        response.body().close();
         return new ResponseAs<>(response.code(), response.headers(), localDate, null);
     }
 }

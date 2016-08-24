@@ -795,16 +795,9 @@ public class PromisesTest {
     @Test
     public void testWhenAll() throws Exception {
 
-        final Deferrable<Mashup<String>> deferrable = new Deferrable<>();
+        final Deferrable<List<String>> deferrable = new Deferrable<>();
 
-        final String[] results = new String[2];
-
-        Promises.whenAll(new Mashup<String>() {
-            @Override
-            public void add(int index, String input) {
-                results[index] = input;
-            }
-        }, Promises.when(new WhenCallback<String>() {
+        Promises.whenAll(Promises.when(new WhenCallback<String>() {
             @Override
             public Deferred<String> run(WhenParams params) throws Exception {
                 return Defer.success("A");
@@ -814,17 +807,17 @@ public class PromisesTest {
             public Deferred<String> run(WhenParams params) throws Exception {
                 return Defer.success("B");
             }
-        })).finish(new FinishCallback<Mashup<String>>() {
+        })).finish(new FinishCallback<List<String>>() {
             @Override
-            public void run(FinishParams<Mashup<String>> params) {
+            public void run(FinishParams<List<String>> params) {
                 deferrable.setResult(params.asResult());
             }
         }).submit();
 
-        deferrable.getResult().safeGetValue();
+        final List<String> results = deferrable.getResult().safeGetValue();
 
-        assertEquals("A", results[0]);
-        assertEquals("B", results[1]);
+        assertEquals("A", results.get(0));
+        assertEquals("B", results.get(1));
     }
 
     @Test
