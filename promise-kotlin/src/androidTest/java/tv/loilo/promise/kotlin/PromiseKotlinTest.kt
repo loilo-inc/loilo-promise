@@ -70,7 +70,7 @@ class PromiseKotlinTest {
             defer<Unit> {
                 latch.countDown()
                 TimeUnit.NANOSECONDS.sleep(Long.MAX_VALUE)
-                throw UnsupportedOperationException();
+                throw UnsupportedOperationException()
             }
         }.finish {
             deferrable.result = it.asResult()
@@ -730,5 +730,46 @@ class PromiseKotlinTest {
         }, whenSucceeded = {
             throw UnsupportedOperationException()
         })
+    }
+
+    @Test
+    fun testWhenAll(){
+        val deferrable = Deferrable<List<String>>()
+        promiseWhenAll(promiseWhen {
+            defer { "A" }
+        }, promiseWhen {
+            defer { "B" }
+        }).finish {
+            deferrable.result = it.asResult()
+        }.submit()
+
+        val results = deferrable.result.safeGetValue()
+
+        assertEquals("A", results[0])
+        assertEquals("B", results[1])
+    }
+
+    @Test
+    fun testWhenAny(){
+        val noSignal = ManualResetEvent(false)
+        val aborted = ManualResetEvent(false)
+        val deferrable = Deferrable<String>()
+        promiseWhenAny(promiseWhen {
+            defer { "A" }
+        }, promiseWhen {
+            defer {
+                noSignal.await()
+                "B"
+            }
+        }).watch {
+            aborted.set()
+        }.finish {
+            deferrable.result = it.asResult()
+        }.submit()
+
+        val value = deferrable.result.safeGetValue()
+        assertEquals("A", value)
+
+        assertTrue(aborted.await(20L, TimeUnit.SECONDS))
     }
 }

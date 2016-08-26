@@ -29,10 +29,6 @@ public final class ResponseStringer implements ResponseFilter<ResponseAs<String>
         mAllowErrorCode = allowErrorCode;
     }
 
-    public ResponseStringer() {
-        this(false);
-    }
-
     @Override
     public ResponseAs<String> pass(@NonNull Response response) throws Exception {
         final Date localDate = new Date();

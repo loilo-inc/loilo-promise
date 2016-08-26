@@ -17,6 +17,7 @@
 package tv.loilo.promise.kotlin
 
 import tv.loilo.promise.*
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 fun runOnUi(process: () -> Unit) {
@@ -123,12 +124,8 @@ fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachPar
     return Promises.forEach(ite, operand, f)
 }
 
-fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<Unit> {
-    return Promises.whenAll(null, promises).exchange(Unit)
-}
-
-fun <T> promiseWhenAll(mashup: (Int, T) -> Unit, vararg promises: Promise<T>): Promise<Unit> {
-    return Promises.whenAll(mashup, promises).exchange(Unit)
+fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<List<T>> {
+    return Promises.whenAll(*promises)
 }
 
 fun <T> promiseWhenAny(vararg promises: Promise<T>): Promise<T> {
