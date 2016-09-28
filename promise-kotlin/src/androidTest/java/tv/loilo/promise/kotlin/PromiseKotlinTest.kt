@@ -422,7 +422,9 @@ class PromiseKotlinTest {
                 it.index.get()
             }
         }.until {
-            it.index.incrementAndGet() >= 3
+            defer {
+                it.index.incrementAndGet() >= 3
+            }
         }.finish {
             deferrable.result = it.asResult()
         }.submit()

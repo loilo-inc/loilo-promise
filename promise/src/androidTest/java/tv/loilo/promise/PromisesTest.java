@@ -591,9 +591,9 @@ public class PromisesTest {
             }
         }).until(new UntilCallback<Integer>() {
             @Override
-            public boolean run(UntilParams<Integer> params) throws Exception {
+            public Deferred<Boolean> run(UntilParams<Integer> params) throws Exception {
                 final int index = params.getIndex().incrementAndGet();
-                return index >= 3;
+                return Defer.success(index >= 3);
             }
         }).finish(new FinishCallback<Integer>() {
             @Override
