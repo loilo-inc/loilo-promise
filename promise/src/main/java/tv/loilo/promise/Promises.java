@@ -278,16 +278,14 @@ public final class Promises {
                             @Override
                             public void run(FinishParams<TOut> finishParams) {
 
-                                if(!finishParams.getCancelToken().isCanceled()){
-                                    if (result.compareAndSet(null, finishParams.asResult())) {
-                                        for (int j = 0; j < promiseCount; ++j) {
-                                            if (j == capture) {
-                                                continue;
-                                            }
-                                            final Canceller canceling = cancellers[j];
-                                            if(canceling != null){
-                                                canceling.cancel();
-                                            }
+                                if (result.compareAndSet(null, finishParams.asResult())) {
+                                    for (int j = 0; j < promiseCount; ++j) {
+                                        if (j == capture) {
+                                            continue;
+                                        }
+                                        final Canceller canceling = cancellers[j];
+                                        if(canceling != null){
+                                            canceling.cancel();
                                         }
                                     }
                                 }

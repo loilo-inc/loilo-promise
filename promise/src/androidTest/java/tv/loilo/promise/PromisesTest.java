@@ -17,6 +17,7 @@
 package tv.loilo.promise;
 
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -823,6 +824,7 @@ public class PromisesTest {
     @Test
     public void testWhenAny() throws Exception {
         final ManualResetEvent noSignal = new ManualResetEvent(false);
+        Log.d("testWhenAny", "aborted.reset");
         final ManualResetEvent aborted = new ManualResetEvent(false);
         final Deferrable<String> deferrable = new Deferrable<>();
         Promises.whenAny(Promises.when(new WhenCallback<String>() {
@@ -836,14 +838,16 @@ public class PromisesTest {
                 noSignal.await();
                 return Defer.success("B");
             }
-        }).watch(new WatchCallback<String>() {
+        })).watch(new WatchCallback<String>() {
             @Override
             public void run(WatchParams<String> params) throws Exception {
+                Log.d("testWhenAny", "aborted.set");
                 aborted.set();
             }
-        })).finish(new FinishCallback<String>() {
+        }).finish(new FinishCallback<String>() {
             @Override
             public void run(FinishParams<String> params) {
+                Log.d("testWhenAny", "finish");
                 deferrable.setResult(params.asResult());
             }
         }).submit();
@@ -851,6 +855,7 @@ public class PromisesTest {
         final String value = deferrable.getResult().safeGetValue();
         assertEquals("A", value);
 
+        Log.d("testWhenAny", "aborted.await");
         assertTrue(aborted.await(20, TimeUnit.SECONDS));
 
     }
