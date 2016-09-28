@@ -20,21 +20,7 @@
             <option value="$PROJECT_DIR$/promise-uitest-kotlin" />
           </set>
         </option>
-        <option name="myModules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/promise" />
-            <option value="$PROJECT_DIR$/promise-http" />
-            <option value="$PROJECT_DIR$/promise-kotlin" />
-            <option value="$PROJECT_DIR$/promise-samples-errorhandling" />
-            <option value="$PROJECT_DIR$/promise-samples-http" />
-            <option value="$PROJECT_DIR$/promise-samples-progress" />
-            <option value="$PROJECT_DIR$/promise-samples-progress-kotlin" />
-            <option value="$PROJECT_DIR$/promise-support" />
-            <option value="$PROJECT_DIR$/promise-support-kotlin" />
-            <option value="$PROJECT_DIR$/promise-uitest-kotlin" />
-          </set>
-        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

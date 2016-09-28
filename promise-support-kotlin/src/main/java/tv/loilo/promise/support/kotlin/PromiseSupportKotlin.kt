@@ -57,5 +57,5 @@ fun <TData, TProgress> LoaderManager.attachProgressCallback(id: Int, loaderCallb
 }
 
 fun <TData, TProgress> LoaderManager.detachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
-    ProgressPromiseLoader.detachProgressCallback(this, id, loaderCallbacks);
+    ProgressPromiseLoader.detachProgressCallback(this, id, loaderCallbacks)
 }

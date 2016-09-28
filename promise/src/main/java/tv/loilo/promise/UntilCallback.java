@@ -27,5 +27,5 @@ public interface UntilCallback<TIn> {
      * @return {@code true} if you want to stop repeat and {@code false} if you want to continue repeat
      * @throws Exception any
      */
-    boolean run(UntilParams<TIn> params) throws Exception;
+    Deferred<Boolean> run(UntilParams<TIn> params) throws Exception;
 }

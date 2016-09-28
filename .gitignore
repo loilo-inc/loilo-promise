@@ -32,3 +32,5 @@ proguard/
 /.idea/*
 !/.idea/gradle.xml
 *.iml
+
+projectFilesBackup/*

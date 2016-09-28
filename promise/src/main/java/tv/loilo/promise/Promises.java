@@ -32,7 +32,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * This class is {@link Promise} Factory.
  */
-@SuppressWarnings("TryFinallyCanBeTryWithResources")
+@SuppressWarnings({"TryFinallyCanBeTryWithResources", "ThrowFromFinallyBlock"})
 public final class Promises {
     private static final ExecutorService mDefaultExecutorService = Executors.newCachedThreadPool();
 
@@ -146,110 +146,6 @@ public final class Promises {
         });
     }
 
-    @Deprecated
-    @SafeVarargs
-    public static <TOut> Promise<Mashup<TOut>> whenAll(final Mashup<TOut> mashup, final Promise<TOut>... promises) {
-        return when(new WhenCallback<Mashup<TOut>>() {
-            @Override
-            public Deferred<Mashup<TOut>> run(WhenParams entryParams) throws Exception {
-
-                final int promiseCount = promises.length;
-                final AtomicInteger finishCount = new AtomicInteger();
-                final AtomicReference<Exception> exception = new AtomicReference<>();
-                final Scheduler scheduler = new Scheduler(1);
-
-                final Deferrable<Mashup<TOut>> deferrable = new Deferrable<>();
-                final ManualResetEvent prepared = new ManualResetEvent(false);
-                final Canceller[] cancellers = new Canceller[promiseCount];
-                final AtomicInteger successCount = new AtomicInteger();
-
-                try{
-                    for (int i = 0; i < promiseCount; ++i) {
-                        final Promise<TOut> promise = promises[i];
-                        final int capture = i;
-                        final Canceller canceller = Promises.when(new WhenCallback<TOut>() {
-                            @Override
-                            public Deferred<TOut> run(WhenParams params) throws Exception {
-                                prepared.await();
-                                return promise.get(params);
-                            }
-                        }).then(new ThenCallback<TOut, Void>() {
-                            @Override
-                            public Deferred<Void> run(final ThenParams<TOut> eachParams) throws Exception {
-                                return when(new WhenCallback<Void>() {
-                                    @Override
-                                    public Deferred<Void> run(WhenParams unused) throws Exception {
-                                        if (eachParams.getCancelToken().isCanceled()) {
-                                            return Defer.cancel();
-                                        }
-
-                                        final Exception e = eachParams.getException();
-                                        if (e != null) {
-                                            return Defer.fail(e);
-                                        }
-
-                                        if(mashup != null){
-                                            mashup.add(capture, eachParams.getValue());
-                                        }
-                                        successCount.incrementAndGet();
-                                        return Defer.success(null);
-                                    }
-                                }).getOn(scheduler, eachParams);
-                            }
-                        }).finish(new FinishCallback<Void>() {
-                            @Override
-                            public void run(FinishParams<Void> finishParams) {
-                                if (!finishParams.getCancelToken().isCanceled()) {
-                                    final Exception e = finishParams.getException();
-                                    if(e != null){
-                                        if (exception.compareAndSet(null, e)) {
-                                            for (int j = 0; j < promiseCount; ++j) {
-                                                if (j == capture) {
-                                                    continue;
-                                                }
-                                                final Canceller canceling = cancellers[j];
-                                                if(canceling != null){
-                                                    canceling.cancel();
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (finishCount.incrementAndGet() >= promiseCount) {
-                                    final Exception e = exception.get();
-                                    if (e != null) {
-                                        deferrable.setFailed(e);
-                                    } else {
-                                        if(successCount.get() >= promiseCount){
-                                            deferrable.setSucceeded(mashup);
-                                        } else {
-                                            deferrable.setCanceled();
-                                        }
-                                    }
-                                }
-                            }
-                        }).submit(entryParams.getTag());
-                        cancellers[i] = canceller;
-                    }
-                } finally {
-                    prepared.set();
-                }
-
-                deferrable.setCancellable(new Cancellable() {
-                    @Override
-                    public void cancel() {
-                        for (Canceller canceller : cancellers) {
-                            canceller.cancel();
-                        }
-                    }
-                });
-
-                return deferrable;
-            }
-        });
-    }
-
     @SafeVarargs
     public static <TOut> Promise<TOut> whenAny(final Promise<TOut>... promises) {
         return when(new WhenCallback<TOut>() {
@@ -278,16 +174,14 @@ public final class Promises {
                             @Override
                             public void run(FinishParams<TOut> finishParams) {
 
-                                if(!finishParams.getCancelToken().isCanceled()){
-                                    if (result.compareAndSet(null, finishParams.asResult())) {
-                                        for (int j = 0; j < promiseCount; ++j) {
-                                            if (j == capture) {
-                                                continue;
-                                            }
-                                            final Canceller canceling = cancellers[j];
-                                            if(canceling != null){
-                                                canceling.cancel();
-                                            }
+                                if (result.compareAndSet(null, finishParams.asResult())) {
+                                    for (int j = 0; j < promiseCount; ++j) {
+                                        if (j == capture) {
+                                            continue;
+                                        }
+                                        final Canceller canceling = cancellers[j];
+                                        if(canceling != null){
+                                            canceling.cancel();
                                         }
                                     }
                                 }
@@ -423,9 +317,9 @@ public final class Promises {
 
                         final Detachable<ArrayCloseableStack> scope = new Detachable<>();
                         try {
-                            Result<TOut> result;
+                            Result<TOut> repeatResult;
                             final AtomicInteger index = new AtomicInteger();
-                            do {
+                            while (true) {
                                 {
                                     final ArrayCloseableStack closing = scope.detach();
                                     if (closing != null) {
@@ -435,34 +329,69 @@ public final class Promises {
 
                                 scope.attach(new ArrayCloseableStack());
 
-                                Deferred<TOut> deferred = null;
+                                Deferred<TOut> deferredRepeatResult = null;
                                 if (params.getCancelToken().isCanceled()) {
-                                    deferred = Defer.cancel();
+                                    deferredRepeatResult = Defer.cancel();
                                 } else {
                                     try {
-                                        deferred = callback.run(new RepeatParams(index, params.getCancelToken(), scope.ref(), params.getTag()));
+                                        deferredRepeatResult = callback.run(new RepeatParams(index, params.getCancelToken(), scope.ref(), params.getTag()));
                                     } catch (final InterruptedException e) {
-                                        deferred = Defer.cancel();
+                                        deferredRepeatResult = Defer.cancel();
                                         Thread.currentThread().interrupt();
                                     } catch (final CancellationException e) {
-                                        deferred = Defer.cancel();
+                                        deferredRepeatResult = Defer.cancel();
                                     } catch (final Exception e) {
-                                        deferred = Defer.fail(e);
+                                        deferredRepeatResult = Defer.fail(e);
                                     } finally {
-                                        if (deferred == null) {
-                                            deferred = Defer.fail(new NullDeferredException("RepeatCallback returned null"));
+                                        if (deferredRepeatResult == null) {
+                                            deferredRepeatResult = Defer.fail(new NullDeferredException("RepeatCallback returned null"));
                                         }
                                     }
                                 }
 
-                                result = Results.exchangeCancelToken(deferred.getResult(), params.getCancelToken());
+                                repeatResult = Results.exchangeCancelToken(deferredRepeatResult.getResult(), params.getCancelToken());
+
+                                if(repeatResult.getCancelToken().isCanceled()){
+                                    break;
+                                }
+
+                                Deferred<Boolean> deferredUntilResult = null;
+                                try {
+                                    deferredUntilResult = untilCallback.run(new UntilParams<>(index, repeatResult, scope.ref(), params.getTag()));
+                                } catch (final InterruptedException e) {
+                                    deferredUntilResult = Defer.cancel();
+                                    Thread.currentThread().interrupt();
+                                } catch (final CancellationException e) {
+                                    deferredUntilResult = Defer.cancel();
+                                } catch (final Exception e) {
+                                    deferredUntilResult = Defer.fail(e);
+                                } finally {
+                                    if (deferredUntilResult == null) {
+                                        deferredUntilResult = Defer.fail(new NullDeferredException("RepeatCallback returned null"));
+                                    }
+                                }
+
+                                final Result<Boolean> untilResult = Results.exchangeCancelToken(deferredUntilResult.getResult(), params.getCancelToken());
+
+                                if(untilResult.getCancelToken().isCanceled()){
+                                    repeatResult = Results.exchangeCancelToken(Results.<TOut>cancel(), params.getCancelToken());
+                                    break;
+                                }
+
+                                final Exception untilException = untilResult.getException();
+                                if(untilException != null){
+                                    repeatResult = Results.exchangeCancelToken(Results.<TOut>fail(untilException), params.getCancelToken());
+                                    break;
+                                }
+
+                                if(untilResult.getValue()){
+                                    break;
+                                }
                             }
-                            while (!result.getCancelToken().isCanceled()
-                                    && !untilCallback.run(new UntilParams<>(index, result, scope.ref(), params.getTag())));
 
                             params.getScope().push(scope.detach());
 
-                            return Defer.complete(result);
+                            return Defer.complete(repeatResult);
                         } finally {
                             scope.close();
                         }
@@ -557,7 +486,7 @@ public final class Promises {
         private volatile boolean mIsCanceled;
         private volatile Future<?> mFuture;
 
-        public FutureCanceller(final Runnable cancelCallback) {
+        FutureCanceller(final Runnable cancelCallback) {
             mCancelCallback = cancelCallback;
             mLock = new ReentrantLock();
         }
@@ -596,7 +525,7 @@ public final class Promises {
             }
         }
 
-        public boolean notifyLaunched() {
+        boolean notifyLaunched() {
             mLock.lock();
             try {
                 mIsLaunched = true;
@@ -606,7 +535,7 @@ public final class Promises {
             }
         }
 
-        public void setFuture(final Future<?> future) {
+        void setFuture(final Future<?> future) {
             mLock.lock();
             try {
                 mFuture = future;
@@ -620,7 +549,7 @@ public final class Promises {
 
         private final Deferrable<TOut> mDeferrable;
 
-        public NextDeferred() {
+        NextDeferred() {
             mDeferrable = new Deferrable<>();
         }
 
@@ -641,7 +570,7 @@ public final class Promises {
         private final EntryPoint mEntryPoint;
         private final FinishCallback<TIn> mFinishCallback;
 
-        public LastPromise(final EntryPoint entryPoint, final FinishCallback<TIn> finishCallback) {
+        LastPromise(final EntryPoint entryPoint, final FinishCallback<TIn> finishCallback) {
             mEntryPoint = entryPoint;
             mFinishCallback = finishCallback;
         }
@@ -688,12 +617,12 @@ public final class Promises {
         private final ThenCallback<TIn, TOut> mThenCallback;
         private NextPoint<TOut> mNextPoint;
 
-        public ContinuationPromise(final EntryPoint entryPoint, final ThenCallback<TIn, TOut> thenCallback) {
+        ContinuationPromise(final EntryPoint entryPoint, final ThenCallback<TIn, TOut> thenCallback) {
             mEntryPoint = entryPoint;
             mThenCallback = thenCallback;
         }
 
-        public void setNextPoint(NextPoint<TOut> nextPoint) {
+        void setNextPoint(NextPoint<TOut> nextPoint) {
             mNextPoint = nextPoint;
         }
 
@@ -899,11 +828,11 @@ public final class Promises {
         private final WhenCallback<TOut> mWhenCallback;
         private NextPoint<TOut> mNextPoint;
 
-        public InitialPromise(WhenCallback<TOut> whenCallback) {
+        InitialPromise(WhenCallback<TOut> whenCallback) {
             mWhenCallback = whenCallback;
         }
 
-        public void setNextPoint(NextPoint<TOut> nextPoint) {
+        void setNextPoint(NextPoint<TOut> nextPoint) {
             mNextPoint = nextPoint;
         }
 
