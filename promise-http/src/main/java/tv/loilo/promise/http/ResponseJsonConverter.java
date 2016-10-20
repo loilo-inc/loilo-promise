@@ -29,11 +29,13 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Date;
 
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.Response;
 
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
-public abstract class ResponseJsonConverter<TJson extends JsonElement> implements ResponseFilter<ResponseAs<TJson>> {
+public abstract class ResponseJsonConverter<TJson extends JsonElement, TResponse extends ResponseAs<TJson>> implements ResponseFilter<TResponse> {
 
     private final boolean mAllowErrorCode;
 
@@ -42,7 +44,14 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement> implement
     }
 
     @NonNull
-    protected abstract TJson convert(@NonNull final JsonElement element);
+    protected abstract TResponse createResponse(final String requestMethod,
+                                         final HttpUrl requestUrl,
+                                         final long sentRequestAtMillis,
+                                         final long receivedResponseAtMillis,
+                                         final int code,
+                                         final Headers headers,
+                                         @NonNull final Date localDate,
+                                         @NonNull final JsonElement element);
 
 
     @NonNull
@@ -70,7 +79,7 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement> implement
 
     @Nullable
     @Override
-    public ResponseAs<TJson> pass(@NonNull Response response) throws Exception {
+    public TResponse pass(@NonNull Response response) throws Exception {
         final Date localDate = new Date();
         boolean statusCodeChecked = false;
         if (!mAllowErrorCode) {
@@ -92,8 +101,15 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement> implement
         final Reader responseReader = response.body().charStream();
         try {
             final JsonElement element = parse(responseReader);
-            final TJson json = convert(element);
-            return new ResponseAs<>(response.code(), response.headers(), localDate, json);
+            return createResponse(
+                    response.request().method(),
+                    response.request().url(),
+                    response.sentRequestAtMillis(),
+                    response.receivedResponseAtMillis(),
+                    response.code(),
+                    response.headers(),
+                    localDate,
+                    element);
         } finally {
             responseReader.close();
         }

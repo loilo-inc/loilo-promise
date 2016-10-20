@@ -21,14 +21,20 @@ import android.support.annotation.NonNull;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public final class ResponseJsonObjectConverter extends ResponseJsonConverter<JsonObject> {
+import java.util.Date;
+
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+
+public final class ResponseJsonObjectConverter extends ResponseJsonConverter<JsonObject, ResponseJsonObject> {
     public ResponseJsonObjectConverter(boolean allowErrorCodeIfPossible) {
         super(allowErrorCodeIfPossible);
     }
 
     @NonNull
     @Override
-    protected JsonObject convert(@NonNull final JsonElement element) {
-        return element.getAsJsonObject();
+    protected ResponseJsonObject createResponse(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, @NonNull Date localDate, @NonNull JsonElement element) {
+        final JsonObject jsonObject = element.getAsJsonObject();
+        return new ResponseJsonObject(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, jsonObject);
     }
 }

@@ -26,9 +26,9 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNull
-import junit.framework.Assert.assertTrue
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 
 @RunWith(AndroidJUnit4::class)
 class PromiseKotlinTest {

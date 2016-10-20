@@ -17,28 +17,100 @@
 package tv.loilo.promise.http;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.util.Date;
 
-import okhttp3.Response;
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
 
-public final class ResponseNoBody implements ResponseFilter<ResponseUnit> {
-    private final boolean mAllowErrorCode;
+public class ResponseNoBody implements ResponseUnit {
 
-    public ResponseNoBody(final boolean allowErrorCode) {
-        mAllowErrorCode = allowErrorCode;
-    }
+    private final String mRequestMethod;
+    private final HttpUrl mRequestUrl;
+    private final long mSentRequestAtMillis;
+    private final long mReceivedResponseAtMillis;
+    private final int mCode;
+    private final Headers mHeaders;
+    private final Date mLocalDate;
 
-    public ResponseNoBody() {
-        this(false);
+    public ResponseNoBody(
+            final String requestMethod,
+            final HttpUrl requestUrl,
+            final long sentRequestAtMillis,
+            final long receivedResponseAtMillis,
+            final int code,
+            final Headers headers,
+            final Date localDate) {
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mCode = code;
+        mHeaders = headers;
+        mLocalDate = localDate;
     }
 
     @Override
-    public ResponseUnit pass(@NonNull Response response) throws Exception {
-        final Date localDate = new Date();
-        if (!mAllowErrorCode) {
-            HttpUtils.ensureSuccessStatusCode(response);
+    public String getRequestMethod() {
+        return mRequestMethod;
+    }
+
+    @Override
+    public HttpUrl getRequestUrl() {
+        return mRequestUrl;
+    }
+
+    @Override
+    public long getSentRequestAtMillis() {
+        return mSentRequestAtMillis;
+    }
+
+    @Override
+    public long getReceivedResponseAtMillis() {
+        return mReceivedResponseAtMillis;
+    }
+
+    @Override
+    public int getCode() {
+        return mCode;
+    }
+
+    @Override
+    public Headers getHeaders() {
+        return mHeaders;
+    }
+
+    @Override
+    @NonNull
+    public Date getLocalDate() {
+        return mLocalDate;
+    }
+
+    @Override
+    @Nullable
+    public Date getServerDate() {
+        if (mHeaders == null) {
+            return null;
         }
-        return new ResponseAs<>(response.code(), response.headers(), localDate, null);
+        return mHeaders.getDate("Date");
+    }
+
+    @Override
+    public String bodyToString() {
+        return "";
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseNoBody{" +
+                "mRequestMethod='" + mRequestMethod + '\'' +
+                ", mRequestUrl=" + mRequestUrl +
+                ", mSentRequestAtMillis=" + mSentRequestAtMillis +
+                ", mReceivedResponseAtMillis=" + mReceivedResponseAtMillis +
+                ", mCode=" + mCode +
+                ", mHeaders=" + mHeaders +
+                ", mLocalDate=" + mLocalDate +
+                '}';
     }
 }

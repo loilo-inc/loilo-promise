@@ -22,29 +22,30 @@ import java.util.Date;
 
 import okhttp3.Response;
 
-public final class ResponseStringer implements ResponseFilter<ResponseString> {
+public final class ResponseNoBodyFilter implements ResponseFilter<ResponseNoBody> {
     private final boolean mAllowErrorCode;
 
-    public ResponseStringer(final boolean allowErrorCode) {
+    public ResponseNoBodyFilter(final boolean allowErrorCode) {
         mAllowErrorCode = allowErrorCode;
     }
 
+    public ResponseNoBodyFilter() {
+        this(false);
+    }
+
     @Override
-    public ResponseString pass(@NonNull Response response) throws Exception {
+    public ResponseNoBody pass(@NonNull Response response) throws Exception {
         final Date localDate = new Date();
         if (!mAllowErrorCode) {
             HttpUtils.ensureSuccessStatusCode(response);
         }
-
-        final String body = response.body().string();
-        return new ResponseString(
+        return new ResponseNoBody(
                 response.request().method(),
                 response.request().url(),
                 response.sentRequestAtMillis(),
                 response.receivedResponseAtMillis(),
                 response.code(),
                 response.headers(),
-                localDate,
-                body);
+                localDate);
     }
 }
