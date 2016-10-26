@@ -27,18 +27,17 @@ import okio.BufferedSink;
 import okio.BufferedSource;
 import okio.Okio;
 
-@Deprecated
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
-public final class ResponseFileExporter implements ResponseFilter<ResponseAs<MediaType>> {
+public class ResponseFileWriter implements ResponseFilter<ResponseFile> {
 
     private final File mOutput;
 
-    public ResponseFileExporter(@NonNull final File output) {
+    public ResponseFileWriter(@NonNull final File output) {
         mOutput = output;
     }
 
     @Override
-    public ResponseAs<MediaType> pass(@NonNull Response response) throws Exception {
+    public ResponseFile pass(@NonNull Response response) throws Exception {
         final Date localDate = new Date();
 
         HttpUtils.ensureSuccessStatusCode(response);
@@ -50,6 +49,7 @@ public final class ResponseFileExporter implements ResponseFilter<ResponseAs<Med
         final boolean isAppending = response.code() == 206;
 
         final MediaType contentType = response.body().contentType();
+        final long contentLength = response.body().contentLength();
         final BufferedSource source = response.body().source();
         try {
             final BufferedSink sink = Okio.buffer(isAppending ? Okio.appendingSink(mOutput) : Okio.sink(mOutput));
@@ -63,7 +63,7 @@ public final class ResponseFileExporter implements ResponseFilter<ResponseAs<Med
             source.close();
         }
 
-        return new ResponseAs<>(
+        return new ResponseFile(
                 response.request().method(),
                 response.request().url(),
                 response.sentRequestAtMillis(),
@@ -71,6 +71,8 @@ public final class ResponseFileExporter implements ResponseFilter<ResponseAs<Med
                 response.code(),
                 response.headers(),
                 localDate,
-                contentType);
+                mOutput,
+                contentType,
+                contentLength);
     }
 }

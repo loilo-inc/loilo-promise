@@ -22,19 +22,56 @@ import android.support.annotation.Nullable;
 import java.util.Date;
 
 import okhttp3.Headers;
+import okhttp3.HttpUrl;
 
-public final class ResponseAs<TBody> implements ResponseUnit {
+public class ResponseAs<TBody> implements ResponseUnit {
 
+    private final String mRequestMethod;
+    private final HttpUrl mRequestUrl;
+    private final long mSentRequestAtMillis;
+    private final long mReceivedResponseAtMillis;
     private final int mCode;
     private final Headers mHeaders;
     private final Date mLocalDate;
     private final TBody mBody;
 
-    public ResponseAs(final int code, final Headers headers, final Date localDate, final TBody body) {
+    public ResponseAs(
+            final String requestMethod,
+            final HttpUrl requestUrl,
+            final long sentRequestAtMillis,
+            final long receivedResponseAtMillis,
+            final int code,
+            final Headers headers,
+            final Date localDate,
+            final TBody body) {
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
         mCode = code;
         mHeaders = headers;
         mLocalDate = localDate;
         mBody = body;
+    }
+
+    @Override
+    public String getRequestMethod() {
+        return mRequestMethod;
+    }
+
+    @Override
+    public HttpUrl getRequestUrl() {
+        return mRequestUrl;
+    }
+
+    @Override
+    public long getSentRequestAtMillis() {
+        return mSentRequestAtMillis;
+    }
+
+    @Override
+    public long getReceivedResponseAtMillis() {
+        return mReceivedResponseAtMillis;
     }
 
     @Override
@@ -62,6 +99,11 @@ public final class ResponseAs<TBody> implements ResponseUnit {
         return mHeaders.getDate("Date");
     }
 
+    @Override
+    public String bodyToString() {
+        return mBody == null ? "" : mBody.toString();
+    }
+
     public TBody getBody() {
         return mBody;
     }
@@ -69,7 +111,11 @@ public final class ResponseAs<TBody> implements ResponseUnit {
     @Override
     public String toString() {
         return "ResponseAs{" +
-                "mCode=" + mCode +
+                "mRequestMethod='" + mRequestMethod + '\'' +
+                ", mRequestUrl=" + mRequestUrl +
+                ", mSentRequestAtMillis=" + mSentRequestAtMillis +
+                ", mReceivedResponseAtMillis=" + mReceivedResponseAtMillis +
+                ", mCode=" + mCode +
                 ", mHeaders=" + mHeaders +
                 ", mLocalDate=" + mLocalDate +
                 ", mBody=" + mBody +

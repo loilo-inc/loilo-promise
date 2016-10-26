@@ -16,32 +16,13 @@
 
 package tv.loilo.promise.http;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
 import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 
-public interface ResponseUnit {
-    String getRequestMethod();
-
-    HttpUrl getRequestUrl();
-
-    long getSentRequestAtMillis();
-
-    long getReceivedResponseAtMillis();
-
-    int getCode();
-
-    Headers getHeaders();
-
-    @NonNull
-    Date getLocalDate();
-
-    @Nullable
-    Date getServerDate();
-
-    String bodyToString();
+public class ResponseString extends ResponseAs<String> {
+    public ResponseString(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, Date localDate, String s) {
+        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, s);
+    }
 }

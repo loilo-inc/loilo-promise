@@ -52,7 +52,9 @@ import tv.loilo.promise.WhenCallback;
 import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.http.HttpProgress;
 import tv.loilo.promise.http.HttpTask;
-import tv.loilo.promise.http.ResponseAs;
+import tv.loilo.promise.http.ResponseJsonArray;
+import tv.loilo.promise.http.ResponseUnit;
+import tv.loilo.promise.http.ResponseUnitMonitor;
 import tv.loilo.promise.support.ProgressPromiseFactory;
 import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
@@ -76,22 +78,27 @@ public class MainActivity extends AppCompatActivity {
                 @NonNull
                 @Override
                 public Promise<List<String>> createPromise(@NonNull final ProgressPromiseLoader<List<String>, HttpProgress> loader) {
-                    return Promises.when(new WhenCallback<ResponseAs<JsonArray>>() {
+                    return Promises.when(new WhenCallback<ResponseJsonArray>() {
                         @Override
-                        public Deferred<ResponseAs<JsonArray>> run(final WhenParams params) throws Exception {
+                        public Deferred<ResponseJsonArray> run(final WhenParams params) throws Exception {
                             final OkHttpClient client = new OkHttpClient();
                             final Request req = new Request.Builder().url("https://raw.githubusercontent.com/loilo-inc/loilo-promise/master/promise-samples-http/src/androidTest/assets/sample.json").get().build();
                             final Call call = client.newCall(req);
-                            return new HttpTask(call).asJsonArray().progress(new ProgressReporter<HttpProgress>() {
+                            return new HttpTask(call).setOnResponseListener(new ResponseUnitMonitor.OnResponseListener() {
+                                @Override
+                                public void onResponse(ResponseUnit response) {
+                                    Log.d("promise-samples-http", response.toString());
+                                }
+                            }).asJsonArray().progress(new ProgressReporter<HttpProgress>() {
                                 @Override
                                 public void report(HttpProgress httpProgress) {
                                     loader.reportProgress(new Transfer<>(params, httpProgress));
                                 }
                             }).promise().get(params);
                         }
-                    }).succeeded(new SuccessCallback<ResponseAs<JsonArray>, List<String>>() {
+                    }).succeeded(new SuccessCallback<ResponseJsonArray, List<String>>() {
                         @Override
-                        public Deferred<List<String>> run(SuccessParams<ResponseAs<JsonArray>> params) throws Exception {
+                        public Deferred<List<String>> run(SuccessParams<ResponseJsonArray> params) throws Exception {
                             final JsonArray array = params.getValue().getBody();
                             final List<String> list = new ArrayList<>();
                             for (JsonElement elem : array) {

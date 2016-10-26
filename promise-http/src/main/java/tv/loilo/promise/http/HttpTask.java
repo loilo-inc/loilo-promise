@@ -18,9 +18,6 @@ package tv.loilo.promise.http;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-
 import java.io.File;
 
 import okhttp3.Call;
@@ -28,48 +25,67 @@ import okhttp3.MediaType;
 
 public final class HttpTask {
     private Call mCall;
+    private ResponseUnitMonitor.OnResponseListener mOnResponseListener;
 
     public HttpTask(Call call) {
         mCall = call;
+    }
+
+    public HttpTask setOnResponseListener(ResponseUnitMonitor.OnResponseListener listener) {
+        mOnResponseListener = listener;
+        return this;
     }
 
     public <TValue> HttpTaskAs<TValue> filterBy(@NonNull final ResponseFilter<TValue> filter) {
         return new HttpTaskAs<>(mCall, filter);
     }
 
-    public HttpTaskAs<ResponseUnit> noBody(final boolean allowErrorCode) {
-        return filterBy(new ResponseNoBody(allowErrorCode));
+    public <TValue extends ResponseUnit> HttpTaskAs<TValue> asResponseUnitBy(@NonNull final ResponseFilter<TValue> filter) {
+        final ResponseUnitMonitor.OnResponseListener listener = mOnResponseListener;
+        if (listener != null) {
+            return filterBy(new ResponseUnitMonitor<>(filter, listener));
+        }
+        return filterBy(filter);
     }
 
-    public HttpTaskAs<ResponseUnit> noBody() {
+    public HttpTaskAs<ResponseNoBody> noBody(final boolean allowErrorCode) {
+        return asResponseUnitBy(new ResponseNoBodyFilter(allowErrorCode));
+    }
+
+    public HttpTaskAs<ResponseNoBody> noBody() {
         return noBody(false);
     }
 
-    public HttpTaskAs<ResponseAs<String>> asString(final boolean allowErrorCode) {
-        return filterBy(new ResponseStringer(allowErrorCode));
+    public HttpTaskAs<ResponseString> asString(final boolean allowErrorCode) {
+        return asResponseUnitBy(new ResponseStringer(allowErrorCode));
     }
 
-    public HttpTaskAs<ResponseAs<String>> asString() {
+    public HttpTaskAs<ResponseString> asString() {
         return asString(false);
     }
 
-    public HttpTaskAs<ResponseAs<JsonObject>> asJsonObject(final boolean allowErrorCodeIfPossible) {
-        return filterBy(new ResponseJsonObjectConverter(allowErrorCodeIfPossible));
+    public HttpTaskAs<ResponseJsonObject> asJsonObject(final boolean allowErrorCodeIfPossible) {
+        return asResponseUnitBy(new ResponseJsonObjectConverter(allowErrorCodeIfPossible));
     }
 
-    public HttpTaskAs<ResponseAs<JsonObject>> asJsonObject() {
+    public HttpTaskAs<ResponseJsonObject> asJsonObject() {
         return asJsonObject(false);
     }
 
-    public HttpTaskAs<ResponseAs<JsonArray>> asJsonArray(final boolean allowErrorCodeIfPossible) {
-        return filterBy(new ResponseJsonArrayConverter(allowErrorCodeIfPossible));
+    public HttpTaskAs<ResponseJsonArray> asJsonArray(final boolean allowErrorCodeIfPossible) {
+        return asResponseUnitBy(new ResponseJsonArrayConverter(allowErrorCodeIfPossible));
     }
 
-    public HttpTaskAs<ResponseAs<JsonArray>> asJsonArray() {
+    public HttpTaskAs<ResponseJsonArray> asJsonArray() {
         return asJsonArray(false);
     }
 
+    public HttpTaskAs<ResponseFile> writeTo(final File output) {
+        return asResponseUnitBy(new ResponseFileWriter(output));
+    }
+
+    @Deprecated
     public HttpTaskAs<ResponseAs<MediaType>> writeToFile(final File output) {
-        return filterBy(new ResponseFileExporter(output));
+        return asResponseUnitBy(new ResponseFileExporter(output));
     }
 }
