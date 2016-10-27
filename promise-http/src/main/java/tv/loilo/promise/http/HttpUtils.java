@@ -54,7 +54,30 @@ public final class HttpUtils {
             return;
         }
 
-        throw new HttpResponseException(code, response.toString());
+        throw new HttpResponseException(
+                response.request().method(),
+                response.request().url(),
+                response.sentRequestAtMillis(),
+                response.receivedResponseAtMillis(),
+                code,
+                response.headers(),
+                response.toString());
+    }
+
+    public static void ensureSuccessStatusCode(@NonNull final ResponseUnit response) throws HttpResponseException {
+        final int code = response.getCode();
+        if (isSuccessful(code)) {
+            return;
+        }
+
+        throw new HttpResponseException(
+                response.getRequestMethod(),
+                response.getRequestUrl(),
+                response.getSentRequestAtMillis(),
+                response.getReceivedResponseAtMillis(),
+                code,
+                response.getHeaders(),
+                response.toString());
     }
 
     @NonNull

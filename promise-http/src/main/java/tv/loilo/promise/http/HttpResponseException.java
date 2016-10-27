@@ -16,30 +16,123 @@
 
 package tv.loilo.promise.http;
 
+import android.support.annotation.Nullable;
+
+import okhttp3.Headers;
+import okhttp3.HttpUrl;
+
 public class HttpResponseException extends RuntimeException {
 
+    private final String mRequestMethod;
+    private final HttpUrl mRequestUrl;
+    private final long mSentRequestAtMillis;
+    private final long mReceivedResponseAtMillis;
     private final int mCode;
+    private final Headers mHeaders;
+
+    public HttpResponseException(final String requestMethod,
+                                 final HttpUrl requestUrl,
+                                 final long sentRequestAtMillis,
+                                 final long receivedResponseAtMillis,
+                                 final int code,
+                                 final Headers headers) {
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mCode = code;
+        mHeaders = headers;
+    }
+
+    public HttpResponseException(final String requestMethod,
+                                 final HttpUrl requestUrl,
+                                 final long sentRequestAtMillis,
+                                 final long receivedResponseAtMillis,
+                                 final int code,
+                                 final Headers headers,
+                                 final String detailMessage) {
+        super(detailMessage);
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mCode = code;
+        mHeaders = headers;
+    }
+
+    public HttpResponseException(final String requestMethod,
+                                 final HttpUrl requestUrl,
+                                 final long sentRequestAtMillis,
+                                 final long receivedResponseAtMillis,
+                                 final int code,
+                                 final Headers headers,
+                                 final String detailMessage,
+                                 final Throwable throwable) {
+        super(detailMessage, throwable);
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mCode = code;
+        mHeaders = headers;
+    }
+
+    public HttpResponseException(final String requestMethod,
+                                 final HttpUrl requestUrl,
+                                 final long sentRequestAtMillis,
+                                 final long receivedResponseAtMillis,
+                                 final int code,
+                                 final Headers headers,
+                                 final Throwable throwable) {
+        super(throwable);
+        mRequestMethod = requestMethod;
+        mRequestUrl = requestUrl;
+        mSentRequestAtMillis = sentRequestAtMillis;
+        mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mCode = code;
+        mHeaders = headers;
+    }
 
     public HttpResponseException(final int code) {
-        mCode = code;
+        this(null, null, -1L, -1L, code, null);
     }
 
     public HttpResponseException(final int code, final String detailMessage) {
-        super(detailMessage);
-        mCode = code;
+        this(null, null, -1L, -1L, code, null, detailMessage);
     }
 
     public HttpResponseException(final int code, final String detailMessage, final Throwable throwable) {
-        super(detailMessage, throwable);
-        mCode = code;
+        this(null, null, -1L, -1L, code, null, detailMessage, throwable);
     }
 
     public HttpResponseException(final int code, final Throwable throwable) {
-        super(throwable);
-        mCode = code;
+        this(null, null, -1L, -1L, code, null, throwable);
+    }
+
+    @Nullable
+    public String getRequestMethod() {
+        return mRequestMethod;
+    }
+
+    @Nullable
+    public HttpUrl getRequestUrl() {
+        return mRequestUrl;
+    }
+
+    public long getSentRequestAtMillis() {
+        return mSentRequestAtMillis;
+    }
+
+    public long getReceivedResponseAtMillis() {
+        return mReceivedResponseAtMillis;
     }
 
     public int getCode() {
         return mCode;
+    }
+
+    @Nullable
+    public Headers getHeaders() {
+        return mHeaders;
     }
 }
