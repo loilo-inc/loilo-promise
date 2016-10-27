@@ -60,7 +60,7 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement, TResponse
         json.setLenient(true);
         try {
             return Streams.parse(json);
-        } catch (StackOverflowError | OutOfMemoryError e) {
+        } catch (final StackOverflowError | OutOfMemoryError e) {
             throw new JsonIOException("Failed parsing JSON source: " + json + " to Json", e);
         } finally {
             json.setLenient(lenient);

@@ -34,7 +34,7 @@ public final class Results {
         return new SimpleResult<>(false, null, null, CancelTokens.CANCELED);
     }
 
-    public static <T> Result<T> fail(Exception e) {
+    public static <T> Result<T> fail(Throwable e) {
         return new SimpleResult<>(false, null, e, CancelTokens.NONE);
     }
 
@@ -46,7 +46,13 @@ public final class Results {
         if (result.getCancelToken().isCanceled()) {
             return cancel();
         }
-        final Exception e = result.getException();
+        Throwable e;
+        try {
+            e = result.getException();
+        } catch (final Error error) {
+            e = error;
+        }
+
         if (e != null) {
             return fail(e);
         }
@@ -60,21 +66,27 @@ public final class Results {
 
         final boolean hasValue = result.hasValue();
         final T value = result.getValue();
-        final Exception error = result.getException();
+        Throwable e;
+        try {
+            e = result.getException();
+        } catch (final Error error) {
+            e = error;
+        }
+
         //Exchanges cancellationState.
-        return new SimpleResult<>(hasValue, value, error, cancelToken);
+        return new SimpleResult<>(hasValue, value, e, cancelToken);
     }
 
     private static class SimpleResult<T> implements Result<T> {
 
         private final boolean mHasValue;
         private final T mValue;
-        private final Exception mException;
+        private final Throwable mException;
         private final CancelToken mCancelToken;
 
         private SimpleResult(
                 boolean hasValue, T value,
-                Exception exception,
+                Throwable exception,
                 CancelToken cancelToken) {
             mHasValue = hasValue;
             mValue = value;
@@ -84,7 +96,13 @@ public final class Results {
 
         @Override
         public Exception getException() {
-            return mException;
+            if (mException == null) {
+                return null;
+            }
+            if (mException instanceof Exception) {
+                return (Exception) mException;
+            }
+            throw (Error) mException;
         }
 
         @Override
@@ -105,7 +123,10 @@ public final class Results {
                 }
 
                 if (mException != null) {
-                    throw mException;
+                    if (mException instanceof Exception) {
+                        throw (Exception) mException;
+                    }
+                    throw (Error) mException;
                 }
 
                 throw new NullPointerException();

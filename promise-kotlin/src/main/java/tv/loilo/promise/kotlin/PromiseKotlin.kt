@@ -136,7 +136,7 @@ fun <T> promiseSuccess(value: T): Promise<T> {
     return Promises.success(value)
 }
 
-fun <T> promiseFail(e: Exception): Promise<T> {
+fun <T> promiseFail(e: Throwable): Promise<T> {
     return Promises.fail(e)
 }
 
@@ -152,7 +152,7 @@ fun <T> deferSuccess(value: T): Deferred<T> {
     return Defer.success(value)
 }
 
-fun <T> deferFail(e: Exception): Deferred<T> {
+fun <T> deferFail(e: Throwable): Deferred<T> {
     return Defer.fail(e)
 }
 

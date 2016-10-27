@@ -116,7 +116,7 @@ public final class Dispatcher {
                     deferrable.setSucceeded(result);
                 } catch (final CancellationException e) {
                     deferrable.setCanceled();
-                } catch (final Exception e) {
+                } catch (final Throwable e) {
                     deferrable.setFailed(e);
                 }
             }

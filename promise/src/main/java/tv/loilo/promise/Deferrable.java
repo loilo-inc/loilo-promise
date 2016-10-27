@@ -44,7 +44,7 @@ public final class Deferrable<T> implements Deferred<T> {
             try {
                 result = mResultPipe.get();
                 break;
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 interrupted = true;
                 cancel();
             }
@@ -73,7 +73,7 @@ public final class Deferrable<T> implements Deferred<T> {
         setResult(Results.<T>cancel());
     }
 
-    public void setFailed(Exception e) {
+    public void setFailed(Throwable e) {
         setResult(Results.<T>fail(e));
     }
 }

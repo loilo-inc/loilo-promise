@@ -181,7 +181,7 @@ public final class HttpContentDisposition {
 
         try {
             return URLDecoder.decode(field, encode);
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             return field;
         }
     }

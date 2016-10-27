@@ -77,7 +77,7 @@ public final class HttpTaskAs<TResponse> {
                             if(mOnFailureListener != null){
                                 try {
                                     mOnFailureListener.onFailure(e);
-                                } catch (Throwable t){
+                                } catch (final Throwable t){
                                     Log.w("loilo-promise-http", "OnFailureListener: Error occurred.", t);
                                 }
                             }
@@ -106,11 +106,11 @@ public final class HttpTaskAs<TResponse> {
                         } catch (final CancellationException e) {
                             deferrable.setCanceled();
                             return;
-                        } catch (final Exception e) {
+                        } catch (final Throwable e) {
                             if(mOnFailureListener != null){
                                 try {
                                     mOnFailureListener.onFailure(e);
-                                } catch (Throwable t){
+                                } catch (final Throwable t){
                                     Log.w("loilo-promise-http", "OnFailureListener: Error occurred.", t);
                                 }
                             }

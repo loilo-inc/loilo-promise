@@ -36,7 +36,7 @@ public final class ResponseUnitMonitor<TResponse extends ResponseUnit> implement
         if(mListener != null){
             try {
                 mListener.onResponse(output);
-            } catch (Throwable e){
+            } catch (final Throwable e){
                 Log.w("loilo-promise-http", "OnResponseListener: Error occurred.", e);
             }
         }
