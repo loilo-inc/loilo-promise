@@ -25,6 +25,7 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public final class ResponseJsonArrayConverter extends ResponseJsonConverter<JsonArray, ResponseJsonArray> {
     public ResponseJsonArrayConverter(boolean allowErrorCodeIfPossible) {
@@ -33,8 +34,8 @@ public final class ResponseJsonArrayConverter extends ResponseJsonConverter<Json
 
     @NonNull
     @Override
-    protected ResponseJsonArray createResponse(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, @NonNull Date localDate, @NonNull JsonElement element) {
+    protected ResponseJsonArray createResponse(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, Protocol protocol, int code, String message, Headers headers, @NonNull Date localDate, @NonNull JsonElement element) {
         final JsonArray jsonArray = element.getAsJsonArray();
-        return new ResponseJsonArray(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, jsonArray);
+        return new ResponseJsonArray(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, protocol, code, message, headers, localDate, jsonArray);
     }
 }

@@ -20,52 +20,70 @@ import android.support.annotation.Nullable;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class HttpResponseException extends RuntimeException {
 
+    @Nullable
     private final String mRequestMethod;
+    @Nullable
     private final HttpUrl mRequestUrl;
     private final long mSentRequestAtMillis;
     private final long mReceivedResponseAtMillis;
+    @Nullable
+    private final Protocol mProtocol;
     private final int mCode;
+    @Nullable
+    private final String mResponseMessage;
+    @Nullable
     private final Headers mHeaders;
 
-    public HttpResponseException(final String requestMethod,
-                                 final HttpUrl requestUrl,
+    public HttpResponseException(@Nullable final String requestMethod,
+                                 @Nullable final HttpUrl requestUrl,
                                  final long sentRequestAtMillis,
                                  final long receivedResponseAtMillis,
+                                 @Nullable final Protocol protocol,
                                  final int code,
-                                 final Headers headers) {
+                                 @Nullable final String responseMessage,
+                                 @Nullable final Headers headers) {
         mRequestMethod = requestMethod;
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mResponseMessage = responseMessage;
         mHeaders = headers;
     }
 
-    public HttpResponseException(final String requestMethod,
-                                 final HttpUrl requestUrl,
+    public HttpResponseException(@Nullable final String requestMethod,
+                                 @Nullable final HttpUrl requestUrl,
                                  final long sentRequestAtMillis,
                                  final long receivedResponseAtMillis,
+                                 @Nullable final Protocol protocol,
                                  final int code,
-                                 final Headers headers,
+                                 @Nullable final String responseMessage,
+                                 @Nullable final Headers headers,
                                  final String detailMessage) {
         super(detailMessage);
         mRequestMethod = requestMethod;
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mResponseMessage = responseMessage;
         mHeaders = headers;
     }
 
-    public HttpResponseException(final String requestMethod,
-                                 final HttpUrl requestUrl,
+    public HttpResponseException(@Nullable final String requestMethod,
+                                 @Nullable final HttpUrl requestUrl,
                                  final long sentRequestAtMillis,
                                  final long receivedResponseAtMillis,
+                                 @Nullable final Protocol protocol,
                                  final int code,
-                                 final Headers headers,
+                                 @Nullable final String responseMessage,
+                                 @Nullable final Headers headers,
                                  final String detailMessage,
                                  final Throwable throwable) {
         super(detailMessage, throwable);
@@ -73,40 +91,46 @@ public class HttpResponseException extends RuntimeException {
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mResponseMessage = responseMessage;
         mHeaders = headers;
     }
 
-    public HttpResponseException(final String requestMethod,
-                                 final HttpUrl requestUrl,
+    public HttpResponseException(@Nullable final String requestMethod,
+                                 @Nullable final HttpUrl requestUrl,
                                  final long sentRequestAtMillis,
                                  final long receivedResponseAtMillis,
+                                 @Nullable final Protocol protocol,
                                  final int code,
-                                 final Headers headers,
+                                 @Nullable final String responseMessage,
+                                 @Nullable final Headers headers,
                                  final Throwable throwable) {
         super(throwable);
         mRequestMethod = requestMethod;
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mResponseMessage = responseMessage;
         mHeaders = headers;
     }
 
     public HttpResponseException(final int code) {
-        this(null, null, -1L, -1L, code, null);
+        this(null, null, -1L, -1L, null, code, null, null);
     }
 
     public HttpResponseException(final int code, final String detailMessage) {
-        this(null, null, -1L, -1L, code, null, detailMessage);
+        this(null, null, -1L, -1L, null, code, null, null, detailMessage);
     }
 
     public HttpResponseException(final int code, final String detailMessage, final Throwable throwable) {
-        this(null, null, -1L, -1L, code, null, detailMessage, throwable);
+        this(null, null, -1L, -1L, null, code, null, null, detailMessage, throwable);
     }
 
     public HttpResponseException(final int code, final Throwable throwable) {
-        this(null, null, -1L, -1L, code, null, throwable);
+        this(null, null, -1L, -1L, null, code, null, null, throwable);
     }
 
     @Nullable
@@ -127,8 +151,18 @@ public class HttpResponseException extends RuntimeException {
         return mReceivedResponseAtMillis;
     }
 
+    @Nullable
+    public Protocol getProtocol() {
+        return mProtocol;
+    }
+
     public int getCode() {
         return mCode;
+    }
+
+    @Nullable
+    public String getResponseMessage() {
+        return mResponseMessage;
     }
 
     @Nullable

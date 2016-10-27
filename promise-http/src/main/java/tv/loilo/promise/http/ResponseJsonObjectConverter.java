@@ -25,6 +25,7 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public final class ResponseJsonObjectConverter extends ResponseJsonConverter<JsonObject, ResponseJsonObject> {
     public ResponseJsonObjectConverter(boolean allowErrorCodeIfPossible) {
@@ -33,8 +34,8 @@ public final class ResponseJsonObjectConverter extends ResponseJsonConverter<Jso
 
     @NonNull
     @Override
-    protected ResponseJsonObject createResponse(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, @NonNull Date localDate, @NonNull JsonElement element) {
+    protected ResponseJsonObject createResponse(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, Protocol protocol, int code, String message, Headers headers, @NonNull Date localDate, @NonNull JsonElement element) {
         final JsonObject jsonObject = element.getAsJsonObject();
-        return new ResponseJsonObject(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, jsonObject);
+        return new ResponseJsonObject(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, protocol, code, message, headers, localDate, jsonObject);
     }
 }

@@ -22,9 +22,20 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class ResponseJsonObject extends ResponseAs<JsonObject> {
-    public ResponseJsonObject(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, Date localDate, JsonObject jsonObject) {
-        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, jsonObject);
+    public ResponseJsonObject(
+            String requestMethod,
+            HttpUrl requestUrl,
+            long sentRequestAtMillis,
+            long receivedResponseAtMillis,
+            final Protocol protocol,
+            final int code,
+            final String message,
+            Headers headers,
+            Date localDate,
+            JsonObject jsonObject) {
+        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, protocol, code, message, headers, localDate, jsonObject);
     }
 }

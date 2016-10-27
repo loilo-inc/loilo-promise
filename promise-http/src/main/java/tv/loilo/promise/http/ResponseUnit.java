@@ -23,6 +23,7 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public interface ResponseUnit {
     String getRequestMethod();
@@ -33,7 +34,11 @@ public interface ResponseUnit {
 
     long getReceivedResponseAtMillis();
 
+    Protocol getProtocol();
+
     int getCode();
+
+    String getMessage();
 
     Headers getHeaders();
 

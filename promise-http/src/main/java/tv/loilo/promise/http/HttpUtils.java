@@ -45,7 +45,7 @@ public final class HttpUtils {
             return;
         }
 
-        throw new HttpResponseException(code);
+        throw new HttpResponseException(code, Integer.toString(code));
     }
 
     public static void ensureSuccessStatusCode(@NonNull final Response response) throws HttpResponseException {
@@ -59,9 +59,11 @@ public final class HttpUtils {
                 response.request().url(),
                 response.sentRequestAtMillis(),
                 response.receivedResponseAtMillis(),
+                response.protocol(),
                 code,
+                response.message(),
                 response.headers(),
-                response.toString());
+                String.valueOf(response.protocol()).toUpperCase() + " " + code + " " + response.message());
     }
 
     public static void ensureSuccessStatusCode(@NonNull final ResponseUnit response) throws HttpResponseException {
@@ -75,9 +77,11 @@ public final class HttpUtils {
                 response.getRequestUrl(),
                 response.getSentRequestAtMillis(),
                 response.getReceivedResponseAtMillis(),
+                response.getProtocol(),
                 code,
+                response.getMessage(),
                 response.getHeaders(),
-                response.toString());
+                String.valueOf(response.getProtocol()).toUpperCase() + " " + code + " " + response.getMessage());
     }
 
     @NonNull
