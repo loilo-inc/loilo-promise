@@ -18,8 +18,8 @@ via Gradle
 
 ```groovy
 dependencies {
-    compile 'tv.loilo.promise:promise:0.7.0'
-    compile 'tv.loilo.promise:promise-support:0.7.0'
+    compile 'tv.loilo.promise:promise:0.8.0'
+    compile 'tv.loilo.promise:promise-support:0.8.0'
 }
 ```
 
