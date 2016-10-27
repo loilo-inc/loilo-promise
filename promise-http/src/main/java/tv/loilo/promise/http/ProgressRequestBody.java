@@ -46,6 +46,10 @@ public final class ProgressRequestBody extends RequestBody {
         this(body, null);
     }
 
+    public RequestBody getOriginalBody() {
+        return mBody;
+    }
+
     @Override
     public MediaType contentType() {
         return mBody.contentType();

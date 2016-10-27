@@ -52,9 +52,9 @@ import tv.loilo.promise.WhenCallback;
 import tv.loilo.promise.WhenParams;
 import tv.loilo.promise.http.HttpProgress;
 import tv.loilo.promise.http.HttpTask;
+import tv.loilo.promise.http.OnResponseListener;
 import tv.loilo.promise.http.ResponseJsonArray;
 import tv.loilo.promise.http.ResponseUnit;
-import tv.loilo.promise.http.ResponseUnitMonitor;
 import tv.loilo.promise.support.ProgressPromiseFactory;
 import tv.loilo.promise.support.ProgressPromiseLoader;
 import tv.loilo.promise.support.ProgressPromiseLoaderCallbacks;
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                             final OkHttpClient client = new OkHttpClient();
                             final Request req = new Request.Builder().url("https://raw.githubusercontent.com/loilo-inc/loilo-promise/master/promise-samples-http/src/androidTest/assets/sample.json").get().build();
                             final Call call = client.newCall(req);
-                            return new HttpTask(call).setOnResponseListener(new ResponseUnitMonitor.OnResponseListener() {
+                            return new HttpTask(call).setOnResponseListener(new OnResponseListener() {
                                 @Override
                                 public void onResponse(ResponseUnit response) {
                                     Log.d("promise-samples-http", response.toString());

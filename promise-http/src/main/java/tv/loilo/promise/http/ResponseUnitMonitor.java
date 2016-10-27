@@ -16,6 +16,8 @@
 
 package tv.loilo.promise.http;
 
+import android.util.Log;
+
 import okhttp3.Response;
 
 public final class ResponseUnitMonitor<TResponse extends ResponseUnit> implements ResponseFilter<TResponse> {
@@ -32,13 +34,12 @@ public final class ResponseUnitMonitor<TResponse extends ResponseUnit> implement
     public TResponse pass(Response response) throws Exception {
         final TResponse output = mFilter.pass(response);
         if(mListener != null){
-            mListener.onResponse(output);
+            try {
+                mListener.onResponse(output);
+            } catch (Throwable e){
+                Log.w("loilo-promise-http", "OnResponseListener: Error occurred.", e);
+            }
         }
         return output;
     }
-
-    public interface OnResponseListener {
-        void onResponse(ResponseUnit response);
-    }
-
 }
