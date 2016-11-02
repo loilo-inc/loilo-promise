@@ -22,7 +22,7 @@ package tv.loilo.promise;
  */
 public final class Transfer<TData> implements TaggedCancelState {
 
-    final Object mTag;
+    private final Object mTag;
     private final CancelToken mCancelToken;
     private final TData mData;
 

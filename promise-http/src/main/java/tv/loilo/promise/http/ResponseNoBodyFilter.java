@@ -44,7 +44,9 @@ public final class ResponseNoBodyFilter implements ResponseFilter<ResponseNoBody
                 response.request().url(),
                 response.sentRequestAtMillis(),
                 response.receivedResponseAtMillis(),
+                response.protocol(),
                 response.code(),
+                response.message(),
                 response.headers(),
                 localDate);
     }

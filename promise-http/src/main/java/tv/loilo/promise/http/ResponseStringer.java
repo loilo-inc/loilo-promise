@@ -42,7 +42,9 @@ public final class ResponseStringer implements ResponseFilter<ResponseString> {
                 response.request().url(),
                 response.sentRequestAtMillis(),
                 response.receivedResponseAtMillis(),
+                response.protocol(),
                 response.code(),
+                response.message(),
                 response.headers(),
                 localDate,
                 body);

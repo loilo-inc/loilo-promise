@@ -48,11 +48,11 @@ public final class Promises {
                 final int promiseCount = promises.length;
                 final ArrayList<TOut> results = new ArrayList<>(promiseCount);
                 //noinspection ForLoopReplaceableByForEach
-                for(int i = 0; i < promiseCount; ++i){
+                for (int i = 0; i < promiseCount; ++i) {
                     results.add(null);
                 }
                 final AtomicInteger finishCount = new AtomicInteger();
-                final AtomicReference<Exception> exception = new AtomicReference<>();
+                final AtomicReference<Throwable> exception = new AtomicReference<>();
                 final Scheduler scheduler = new Scheduler(1);
 
                 final Deferrable<List<TOut>> deferrable = new Deferrable<>();
@@ -60,7 +60,7 @@ public final class Promises {
                 final Canceller[] cancellers = new Canceller[promiseCount];
                 final AtomicInteger successCount = new AtomicInteger();
 
-                try{
+                try {
                     for (int i = 0; i < promiseCount; ++i) {
                         final Promise<TOut> promise = promises[i];
                         final int capture = i;
@@ -80,7 +80,13 @@ public final class Promises {
                                             return Defer.cancel();
                                         }
 
-                                        final Exception e = eachParams.getException();
+                                        Throwable e;
+                                        try {
+                                            e = eachParams.getException();
+                                        } catch (final Error error) {
+                                            e = error;
+                                        }
+
                                         if (e != null) {
                                             return Defer.fail(e);
                                         }
@@ -96,15 +102,21 @@ public final class Promises {
                             @Override
                             public void run(FinishParams<Void> finishParams) {
                                 if (!finishParams.getCancelToken().isCanceled()) {
-                                    final Exception e = finishParams.getException();
-                                    if(e != null){
+                                    Throwable e;
+                                    try {
+                                        e = finishParams.getException();
+                                    } catch (final Error error) {
+                                        e = error;
+                                    }
+
+                                    if (e != null) {
                                         if (exception.compareAndSet(null, e)) {
                                             for (int j = 0; j < promiseCount; ++j) {
                                                 if (j == capture) {
                                                     continue;
                                                 }
                                                 final Canceller canceling = cancellers[j];
-                                                if(canceling != null){
+                                                if (canceling != null) {
                                                     canceling.cancel();
                                                 }
                                             }
@@ -113,11 +125,11 @@ public final class Promises {
                                 }
 
                                 if (finishCount.incrementAndGet() >= promiseCount) {
-                                    final Exception e = exception.get();
+                                    final Throwable e = exception.get();
                                     if (e != null) {
                                         deferrable.setFailed(e);
                                     } else {
-                                        if(successCount.get() >= promiseCount){
+                                        if (successCount.get() >= promiseCount) {
                                             deferrable.setSucceeded(results);
                                         } else {
                                             deferrable.setCanceled();
@@ -180,7 +192,7 @@ public final class Promises {
                                             continue;
                                         }
                                         final Canceller canceling = cancellers[j];
-                                        if(canceling != null){
+                                        if (canceling != null) {
                                             canceling.cancel();
                                         }
                                     }
@@ -188,7 +200,7 @@ public final class Promises {
 
                                 if (finishCount.incrementAndGet() >= promiseCount) {
                                     final Result<TOut> ret = result.get();
-                                    if(ret != null){
+                                    if (ret != null) {
                                         deferrable.setResult(ret);
                                     } else {
                                         deferrable.setCanceled();
@@ -220,7 +232,7 @@ public final class Promises {
      * Promise to return a result of the callback.
      * The callback will be execute asynchronously on background thread.
      * Promise will be executing when you called a method to submit.
-     *
+     * <p>
      * If Promise is canceled before the callback execution,
      * this callback call is skipped, and calls the subsequent callback.
      *
@@ -256,7 +268,7 @@ public final class Promises {
      * @param <TOut> the type of the output value if Promise were to success
      * @return promise to return a failure result
      */
-    public static <TOut> Promise<TOut> fail(final Exception e) {
+    public static <TOut> Promise<TOut> fail(final Throwable e) {
         return when(new WhenCallback<TOut>() {
 
             @Override
@@ -340,7 +352,7 @@ public final class Promises {
                                         Thread.currentThread().interrupt();
                                     } catch (final CancellationException e) {
                                         deferredRepeatResult = Defer.cancel();
-                                    } catch (final Exception e) {
+                                    } catch (final Throwable e) {
                                         deferredRepeatResult = Defer.fail(e);
                                     } finally {
                                         if (deferredRepeatResult == null) {
@@ -351,7 +363,7 @@ public final class Promises {
 
                                 repeatResult = Results.exchangeCancelToken(deferredRepeatResult.getResult(), params.getCancelToken());
 
-                                if(repeatResult.getCancelToken().isCanceled()){
+                                if (repeatResult.getCancelToken().isCanceled()) {
                                     break;
                                 }
 
@@ -363,7 +375,7 @@ public final class Promises {
                                     Thread.currentThread().interrupt();
                                 } catch (final CancellationException e) {
                                     deferredUntilResult = Defer.cancel();
-                                } catch (final Exception e) {
+                                } catch (final Throwable e) {
                                     deferredUntilResult = Defer.fail(e);
                                 } finally {
                                     if (deferredUntilResult == null) {
@@ -373,18 +385,24 @@ public final class Promises {
 
                                 final Result<Boolean> untilResult = Results.exchangeCancelToken(deferredUntilResult.getResult(), params.getCancelToken());
 
-                                if(untilResult.getCancelToken().isCanceled()){
+                                if (untilResult.getCancelToken().isCanceled()) {
                                     repeatResult = Results.exchangeCancelToken(Results.<TOut>cancel(), params.getCancelToken());
                                     break;
                                 }
 
-                                final Exception untilException = untilResult.getException();
-                                if(untilException != null){
+                                Throwable untilException;
+                                try {
+                                    untilException = untilResult.getException();
+                                } catch (final Error error) {
+                                    untilException = error;
+                                }
+
+                                if (untilException != null) {
                                     repeatResult = Results.exchangeCancelToken(Results.<TOut>fail(untilException), params.getCancelToken());
                                     break;
                                 }
 
-                                if(untilResult.getValue()){
+                                if (untilResult.getValue()) {
                                     break;
                                 }
                             }
@@ -446,7 +464,13 @@ public final class Promises {
             return Defer.cancel();
         }
 
-        final Exception e = params.getException();
+        Throwable e;
+        try {
+            e = params.getException();
+        } catch (final Error error) {
+            e = error;
+        }
+
         if (e != null) {
             return Defer.fail(e);
         }
@@ -462,7 +486,13 @@ public final class Promises {
             return Defer.cancel();
         }
 
-        final Exception e = params.getException();
+        Throwable e;
+        try {
+            e = params.getException();
+        } catch (final Error error) {
+            e = error;
+        }
+
         if (e != null) {
             return callback.run(new FailParams<TIn>(e, cancelToken, params.getScope(), params.getTag()));
         }
@@ -636,7 +666,7 @@ public final class Promises {
                 Thread.currentThread().interrupt();
             } catch (final CancellationException e) {
                 deferred = Defer.cancel();
-            } catch (final Exception e) {
+            } catch (final Throwable e) {
                 deferred = Defer.fail(e);
             } finally {
                 if (deferred == null) {
@@ -851,7 +881,7 @@ public final class Promises {
                     Thread.currentThread().interrupt();
                 } catch (final CancellationException e) {
                     handle = Defer.cancel();
-                } catch (final Exception e) {
+                } catch (final Throwable e) {
                     handle = Defer.fail(e);
                 } finally {
                     if (handle == null) {
@@ -956,7 +986,7 @@ public final class Promises {
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
                         execute(CancelTokens.CANCELED, scope, tag);
-                    } catch (final RuntimeException e) {
+                    } catch (final Exception e) {
                         hasCriticalError = true;
                         Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
                         Dispatcher.getMainDispatcher().run(new Runnable() {
@@ -979,8 +1009,19 @@ public final class Promises {
                     } finally {
                         try {
                             scope.close();
+                        } catch (final Exception e) {
+                            if (!hasCriticalError) {
+                                hasCriticalError = true;
+                                Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
+                                Dispatcher.getMainDispatcher().run(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Throw on main thread to crash the application.
+                                        throw e;
+                                    }
+                                });
+                            }
                         } catch (final Error e) {
-
                             if (!hasCriticalError) {
                                 hasCriticalError = true;
                                 Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred on canceling.", e);
@@ -994,7 +1035,27 @@ public final class Promises {
                             }
                         } finally {
                             if (!hasCriticalError && postProcess != null) {
-                                postProcess.run();
+                                try {
+                                    postProcess.run();
+                                } catch (final Exception e) {
+                                    Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
+                                    Dispatcher.getMainDispatcher().run(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Throw on main thread to crash the application.
+                                            throw e;
+                                        }
+                                    });
+                                } catch (final Error e) {
+                                    Log.wtf("loilo-promise", "InitialPromise: Promise error occurred on canceling.", e);
+                                    Dispatcher.getMainDispatcher().run(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Throw on main thread to crash the application.
+                                            throw e;
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -1012,7 +1073,7 @@ public final class Promises {
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
                         execute(canceller, scope, tag);
-                    } catch (final RuntimeException e) {
+                    } catch (final Exception e) {
                         hasCriticalError = true;
                         Log.e("loilo-promise", "InitialPromise: Promise exception occurred.", e);
                         Dispatcher.getMainDispatcher().run(new Runnable() {
@@ -1035,8 +1096,19 @@ public final class Promises {
                     } finally {
                         try {
                             scope.close();
+                        } catch (final Exception e) {
+                            if (!hasCriticalError) {
+                                hasCriticalError = true;
+                                Log.e("loilo-promise", "InitialPromise: Promise exception occurred.", e);
+                                Dispatcher.getMainDispatcher().run(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Throw on main thread to crash the application.
+                                        throw e;
+                                    }
+                                });
+                            }
                         } catch (final Error e) {
-
                             if (!hasCriticalError) {
                                 hasCriticalError = true;
                                 Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred.", e);
@@ -1050,7 +1122,27 @@ public final class Promises {
                             }
                         } finally {
                             if (!hasCriticalError && postProcess != null) {
-                                postProcess.run();
+                                try {
+                                    postProcess.run();
+                                } catch (final Exception e) {
+                                    Log.e("loilo-promise", "InitialPromise: Promise exception occurred.", e);
+                                    Dispatcher.getMainDispatcher().run(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Throw on main thread to crash the application.
+                                            throw e;
+                                        }
+                                    });
+                                } catch (final Error e) {
+                                    Log.wtf("loilo-promise", "InitialPromise: Promise error occurred.", e);
+                                    Dispatcher.getMainDispatcher().run(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            //Throw on main thread to crash the application.
+                                            throw e;
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -1096,7 +1188,7 @@ public final class Promises {
                     final ArrayCloseableStack scope = new ArrayCloseableStack();
                     try {
                         execute(CancelTokens.CANCELED, scope, tag);
-                    } catch (final RuntimeException e) {
+                    } catch (final Exception e) {
                         hasCriticalError = true;
                         Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
                         Dispatcher.getMainDispatcher().run(new Runnable() {
@@ -1119,6 +1211,17 @@ public final class Promises {
                     } finally {
                         try {
                             scope.close();
+                        } catch (final Exception e) {
+                            if (!hasCriticalError) {
+                                Log.e("loilo-promise", "InitialPromise: Promise exception occurred on canceling.", e);
+                                Dispatcher.getMainDispatcher().run(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //Throw on main thread to crash the application.
+                                        throw e;
+                                    }
+                                });
+                            }
                         } catch (final Error e) {
                             if (!hasCriticalError) {
                                 Log.wtf("loilo-promise", "InitialPromise: Scope close error occurred on canceling.", e);

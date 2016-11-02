@@ -100,12 +100,10 @@ public final class HttpProgress implements Progress {
 
     @Override
     public String toString() {
-        return "HttpProgress{" +
-                "mPhase=" + mPhase +
-                ", mCode=" + mCode +
-                ", mBytesProceeded=" + mBytesProceeded +
-                ", mContentLength=" + mContentLength +
-                ", mMessage='" + mMessage + '\'' +
-                '}';
+        if (mPhase == Phase.RESPONSE) {
+            return String.valueOf(mPhase) + "(" + mCode + ") " + mBytesProceeded + "/" + mContentLength + " bytes";
+        }
+
+        return String.valueOf(mPhase) + " " + mBytesProceeded + "/" + mContentLength + " bytes";
     }
 }

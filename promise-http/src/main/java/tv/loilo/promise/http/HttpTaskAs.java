@@ -18,6 +18,7 @@ package tv.loilo.promise.http;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.concurrent.CancellationException;
@@ -41,11 +42,14 @@ public final class HttpTaskAs<TResponse> {
     @NonNull
     private final ResponseFilter<TResponse> mFilter;
     @Nullable
+    private OnFailureListener mOnFailureListener;
+    @Nullable
     private ProgressReporter<HttpProgress> mReporter;
 
-    public HttpTaskAs(@NonNull final Call call, @NonNull final ResponseFilter<TResponse> filter) {
+    public HttpTaskAs(@NonNull final Call call, @NonNull final ResponseFilter<TResponse> filter, @Nullable OnFailureListener onFailureListener) {
         mCall = call;
         mFilter = filter;
+        mOnFailureListener = onFailureListener;
     }
 
     public HttpTaskAs<TResponse> progress(@Nullable final ProgressReporter<HttpProgress> reporter) {
@@ -70,6 +74,13 @@ public final class HttpTaskAs<TResponse> {
                         if (call.isCanceled()) {
                             deferrable.setCanceled();
                         } else {
+                            if(mOnFailureListener != null){
+                                try {
+                                    mOnFailureListener.onFailure(e);
+                                } catch (final Throwable t){
+                                    Log.w("loilo-promise-http", "OnFailureListener: Error occurred.", t);
+                                }
+                            }
                             deferrable.setFailed(e);
                         }
                     }
@@ -95,7 +106,14 @@ public final class HttpTaskAs<TResponse> {
                         } catch (final CancellationException e) {
                             deferrable.setCanceled();
                             return;
-                        } catch (final Exception e) {
+                        } catch (final Throwable e) {
+                            if(mOnFailureListener != null){
+                                try {
+                                    mOnFailureListener.onFailure(e);
+                                } catch (final Throwable t){
+                                    Log.w("loilo-promise-http", "OnFailureListener: Error occurred.", t);
+                                }
+                            }
                             deferrable.setFailed(e);
                             return;
                         }

@@ -77,7 +77,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     private Promise<TData> getPromise() {
         try {
             return onCreatePromise();
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
             return Promises.fail(e);
         }
     }
@@ -141,7 +141,13 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
 
                         mCanceller = null;
 
-                        final Exception e = params.getException();
+                        Throwable e;
+                        try {
+                            e = params.getException();
+                        } catch (final Error error) {
+                            e = error;
+                        }
+
                         if (e != null) {
                             if (!isAbandoned()) {
                                 rollbackContentChanged();

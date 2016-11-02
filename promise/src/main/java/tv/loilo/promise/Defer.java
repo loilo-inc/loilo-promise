@@ -31,7 +31,7 @@ public final class Defer {
         return new Completed<>(Results.success(value));
     }
 
-    public static <T> Deferred<T> fail(Exception e) {
+    public static <T> Deferred<T> fail(Throwable e) {
         return new Completed<>(Results.<T>fail(e));
     }
 

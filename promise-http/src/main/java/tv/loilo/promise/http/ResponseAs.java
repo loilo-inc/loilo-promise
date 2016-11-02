@@ -23,6 +23,7 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class ResponseAs<TBody> implements ResponseUnit {
 
@@ -30,7 +31,9 @@ public class ResponseAs<TBody> implements ResponseUnit {
     private final HttpUrl mRequestUrl;
     private final long mSentRequestAtMillis;
     private final long mReceivedResponseAtMillis;
+    private final Protocol mProtocol;
     private final int mCode;
+    private final String mMessage;
     private final Headers mHeaders;
     private final Date mLocalDate;
     private final TBody mBody;
@@ -40,7 +43,9 @@ public class ResponseAs<TBody> implements ResponseUnit {
             final HttpUrl requestUrl,
             final long sentRequestAtMillis,
             final long receivedResponseAtMillis,
+            final Protocol protocol,
             final int code,
+            final String message,
             final Headers headers,
             final Date localDate,
             final TBody body) {
@@ -48,7 +53,9 @@ public class ResponseAs<TBody> implements ResponseUnit {
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mMessage = message;
         mHeaders = headers;
         mLocalDate = localDate;
         mBody = body;
@@ -75,8 +82,18 @@ public class ResponseAs<TBody> implements ResponseUnit {
     }
 
     @Override
+    public Protocol getProtocol() {
+        return mProtocol;
+    }
+
+    @Override
     public int getCode() {
         return mCode;
+    }
+
+    @Override
+    public String getMessage() {
+        return mMessage;
     }
 
     @Override
@@ -110,15 +127,18 @@ public class ResponseAs<TBody> implements ResponseUnit {
 
     @Override
     public String toString() {
-        return "ResponseAs{" +
-                "mRequestMethod='" + mRequestMethod + '\'' +
-                ", mRequestUrl=" + mRequestUrl +
-                ", mSentRequestAtMillis=" + mSentRequestAtMillis +
-                ", mReceivedResponseAtMillis=" + mReceivedResponseAtMillis +
-                ", mCode=" + mCode +
-                ", mHeaders=" + mHeaders +
-                ", mLocalDate=" + mLocalDate +
-                ", mBody=" + mBody +
-                '}';
+        final StringBuilder sb = new StringBuilder();
+        sb.append(String.valueOf(mProtocol).toUpperCase()).append(" ")
+                .append(mCode).append(" ")
+                .append(mMessage).append(" ")
+                .append(mRequestMethod).append(" ")
+                .append(mRequestUrl).append(" in ")
+                .append(mReceivedResponseAtMillis - mSentRequestAtMillis).append(" ms\n")
+                .append(mHeaders);
+        final String bodyString = bodyToString();
+        if (bodyString != null && bodyString.length() > 0) {
+            sb.append("\n").append(bodyString);
+        }
+        return sb.toString();
     }
 }

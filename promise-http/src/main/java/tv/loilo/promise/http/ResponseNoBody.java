@@ -23,6 +23,7 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class ResponseNoBody implements ResponseUnit {
 
@@ -30,7 +31,9 @@ public class ResponseNoBody implements ResponseUnit {
     private final HttpUrl mRequestUrl;
     private final long mSentRequestAtMillis;
     private final long mReceivedResponseAtMillis;
+    private final Protocol mProtocol;
     private final int mCode;
+    private final String mMessage;
     private final Headers mHeaders;
     private final Date mLocalDate;
 
@@ -39,14 +42,18 @@ public class ResponseNoBody implements ResponseUnit {
             final HttpUrl requestUrl,
             final long sentRequestAtMillis,
             final long receivedResponseAtMillis,
+            final Protocol protocol,
             final int code,
+            final String message,
             final Headers headers,
             final Date localDate) {
         mRequestMethod = requestMethod;
         mRequestUrl = requestUrl;
         mSentRequestAtMillis = sentRequestAtMillis;
         mReceivedResponseAtMillis = receivedResponseAtMillis;
+        mProtocol = protocol;
         mCode = code;
+        mMessage = message;
         mHeaders = headers;
         mLocalDate = localDate;
     }
@@ -72,8 +79,18 @@ public class ResponseNoBody implements ResponseUnit {
     }
 
     @Override
+    public Protocol getProtocol() {
+        return mProtocol;
+    }
+
+    @Override
     public int getCode() {
         return mCode;
+    }
+
+    @Override
+    public String getMessage() {
+        return mMessage;
     }
 
     @Override
@@ -103,14 +120,12 @@ public class ResponseNoBody implements ResponseUnit {
 
     @Override
     public String toString() {
-        return "ResponseNoBody{" +
-                "mRequestMethod='" + mRequestMethod + '\'' +
-                ", mRequestUrl=" + mRequestUrl +
-                ", mSentRequestAtMillis=" + mSentRequestAtMillis +
-                ", mReceivedResponseAtMillis=" + mReceivedResponseAtMillis +
-                ", mCode=" + mCode +
-                ", mHeaders=" + mHeaders +
-                ", mLocalDate=" + mLocalDate +
-                '}';
+        return String.valueOf(mProtocol).toUpperCase() + " " +
+                mCode + " " +
+                mMessage + " " +
+                mRequestMethod + " " +
+                mRequestUrl + " in " +
+                (mReceivedResponseAtMillis - mSentRequestAtMillis) + " ms\n" +
+                mHeaders;
     }
 }

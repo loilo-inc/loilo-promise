@@ -68,7 +68,9 @@ public final class ResponseFileExporter implements ResponseFilter<ResponseAs<Med
                 response.request().url(),
                 response.sentRequestAtMillis(),
                 response.receivedResponseAtMillis(),
+                response.protocol(),
                 response.code(),
+                response.message(),
                 response.headers(),
                 localDate,
                 contentType);

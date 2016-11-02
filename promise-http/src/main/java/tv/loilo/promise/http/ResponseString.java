@@ -20,9 +20,20 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class ResponseString extends ResponseAs<String> {
-    public ResponseString(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, Date localDate, String s) {
-        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, s);
+    public ResponseString(
+            String requestMethod,
+            HttpUrl requestUrl,
+            long sentRequestAtMillis,
+            long receivedResponseAtMillis,
+            final Protocol protocol,
+            final int code,
+            final String message,
+            Headers headers,
+            Date localDate,
+            String s) {
+        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, protocol, code, message, headers, localDate, s);
     }
 }

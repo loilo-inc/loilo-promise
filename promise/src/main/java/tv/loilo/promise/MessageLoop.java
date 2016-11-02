@@ -57,7 +57,7 @@ public final class MessageLoop {
             try {
                 event.await();
                 break;
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 interrupted = true;
             }
         }

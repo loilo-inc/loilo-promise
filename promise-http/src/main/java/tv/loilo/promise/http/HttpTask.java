@@ -25,23 +25,29 @@ import okhttp3.MediaType;
 
 public final class HttpTask {
     private Call mCall;
-    private ResponseUnitMonitor.OnResponseListener mOnResponseListener;
+    private OnResponseListener mOnResponseListener;
+    private OnFailureListener mOnFailureListener;
 
     public HttpTask(Call call) {
         mCall = call;
     }
 
-    public HttpTask setOnResponseListener(ResponseUnitMonitor.OnResponseListener listener) {
+    public HttpTask setOnResponseListener(OnResponseListener listener) {
         mOnResponseListener = listener;
         return this;
     }
 
+    public HttpTask setOnFailureListener(OnFailureListener listener) {
+        mOnFailureListener = listener;
+        return this;
+    }
+
     public <TValue> HttpTaskAs<TValue> filterBy(@NonNull final ResponseFilter<TValue> filter) {
-        return new HttpTaskAs<>(mCall, filter);
+        return new HttpTaskAs<>(mCall, filter, mOnFailureListener);
     }
 
     public <TValue extends ResponseUnit> HttpTaskAs<TValue> asResponseUnitBy(@NonNull final ResponseFilter<TValue> filter) {
-        final ResponseUnitMonitor.OnResponseListener listener = mOnResponseListener;
+        final OnResponseListener listener = mOnResponseListener;
         if (listener != null) {
             return filterBy(new ResponseUnitMonitor<>(filter, listener));
         }

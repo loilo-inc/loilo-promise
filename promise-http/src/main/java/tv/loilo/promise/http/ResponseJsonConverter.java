@@ -32,6 +32,7 @@ import java.util.Date;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
+import okhttp3.Protocol;
 import okhttp3.Response;
 
 @SuppressWarnings("TryFinallyCanBeTryWithResources")
@@ -44,14 +45,17 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement, TResponse
     }
 
     @NonNull
-    protected abstract TResponse createResponse(final String requestMethod,
-                                         final HttpUrl requestUrl,
-                                         final long sentRequestAtMillis,
-                                         final long receivedResponseAtMillis,
-                                         final int code,
-                                         final Headers headers,
-                                         @NonNull final Date localDate,
-                                         @NonNull final JsonElement element);
+    protected abstract TResponse createResponse(
+            final String requestMethod,
+            final HttpUrl requestUrl,
+            final long sentRequestAtMillis,
+            final long receivedResponseAtMillis,
+            final Protocol protocol,
+            final int code,
+            final String message,
+            final Headers headers,
+            @NonNull final Date localDate,
+            @NonNull final JsonElement element);
 
 
     @NonNull
@@ -60,7 +64,7 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement, TResponse
         json.setLenient(true);
         try {
             return Streams.parse(json);
-        } catch (StackOverflowError | OutOfMemoryError e) {
+        } catch (final StackOverflowError | OutOfMemoryError e) {
             throw new JsonIOException("Failed parsing JSON source: " + json + " to Json", e);
         } finally {
             json.setLenient(lenient);
@@ -106,7 +110,9 @@ public abstract class ResponseJsonConverter<TJson extends JsonElement, TResponse
                     response.request().url(),
                     response.sentRequestAtMillis(),
                     response.receivedResponseAtMillis(),
+                    response.protocol(),
                     response.code(),
+                    response.message(),
                     response.headers(),
                     localDate,
                     element);

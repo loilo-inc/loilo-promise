@@ -16,37 +16,6 @@
 
 package tv.loilo.promise.http;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-
-import java.util.Date;
-
-import okhttp3.Headers;
-import okhttp3.HttpUrl;
-import okhttp3.Protocol;
-
-public interface ResponseUnit {
-    String getRequestMethod();
-
-    HttpUrl getRequestUrl();
-
-    long getSentRequestAtMillis();
-
-    long getReceivedResponseAtMillis();
-
-    Protocol getProtocol();
-
-    int getCode();
-
-    String getMessage();
-
-    Headers getHeaders();
-
-    @NonNull
-    Date getLocalDate();
-
-    @Nullable
-    Date getServerDate();
-
-    String bodyToString();
+public interface OnResponseListener {
+    void onResponse(ResponseUnit response);
 }

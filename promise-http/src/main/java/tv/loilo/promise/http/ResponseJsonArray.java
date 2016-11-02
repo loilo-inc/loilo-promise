@@ -22,9 +22,20 @@ import java.util.Date;
 
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
+import okhttp3.Protocol;
 
 public class ResponseJsonArray extends ResponseAs<JsonArray> {
-    public ResponseJsonArray(String requestMethod, HttpUrl requestUrl, long sentRequestAtMillis, long receivedResponseAtMillis, int code, Headers headers, Date localDate, JsonArray jsonElements) {
-        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, code, headers, localDate, jsonElements);
+    public ResponseJsonArray(
+            String requestMethod,
+            HttpUrl requestUrl,
+            long sentRequestAtMillis,
+            long receivedResponseAtMillis,
+            final Protocol protocol,
+            final int code,
+            final String message,
+            Headers headers,
+            Date localDate,
+            JsonArray jsonElements) {
+        super(requestMethod, requestUrl, sentRequestAtMillis, receivedResponseAtMillis, protocol, code, message, headers, localDate, jsonElements);
     }
 }
