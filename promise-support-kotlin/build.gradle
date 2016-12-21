@@ -25,7 +25,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile "com.android.support:support-v4:${android_support_version}"
+    compile "com.android.support:support-fragment:${android_support_version}"
     compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
     compile project(':promise')
     compile project(':promise-kotlin')
