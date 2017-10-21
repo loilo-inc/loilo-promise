@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
+@file:Suppress("unused")
+
 package tv.loilo.promise.kotlin
 
 import tv.loilo.promise.*
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 fun runOnUi(process: () -> Unit) {
@@ -60,9 +61,7 @@ fun postOnUiWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
     }
 }
 
-fun <T> callOnUi(process: () -> T): Deferred<T> {
-    return Dispatcher.getMainDispatcher().call(process)
-}
+fun <T> callOnUi(process: () -> T): Deferred<T> = Dispatcher.getMainDispatcher().call(process)
 
 fun runOnBg(process: () -> Unit) {
     Dispatcher.getSubDispatcher().run(process)
@@ -104,69 +103,39 @@ fun postOnBgWithCancel(process: () -> Unit, delayMills: Long): Cancellable {
     }
 }
 
-fun <T> callOnBg(process: () -> T): Deferred<T> {
-    return Dispatcher.getSubDispatcher().call(process)
-}
+fun <T> callOnBg(process: () -> T): Deferred<T> = Dispatcher.getSubDispatcher().call(process)
 
-fun <T> promiseWhen(f: (WhenParams) -> Deferred<T>): Promise<T> {
-    return Promises.`when`(f)
-}
+fun <T> promiseWhen(f: (WhenParams) -> Deferred<T>): Promise<T> = Promises.`when`(f)
 
-fun <T> promiseRepeat(f: (RepeatParams) -> Deferred<T>): Repeat<T> {
-    return Promises.repeat(f)
-}
+fun <T> promiseRepeat(f: (RepeatParams) -> Deferred<T>): Repeat<T> = Promises.repeat(f)
 
-fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T, Unit>) -> Deferred<ForEachOp>): Promise<Unit> {
-    return Promises.forEach(ite, Unit, f)
-}
+fun <T> promiseForEach(ite: Iterable<T>, f: (ForEachParams<T, Unit>) -> Deferred<ForEachOp>): Promise<Unit> =
+        Promises.forEach(ite, Unit, f)
 
-fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachParams<TIn, TOut>) -> Deferred<ForEachOp>): Promise<TOut> {
-    return Promises.forEach(ite, operand, f)
-}
+fun <TIn, TOut> promiseForEach(ite: Iterable<TIn>, operand: TOut, f: (ForEachParams<TIn, TOut>) -> Deferred<ForEachOp>): Promise<TOut> =
+        Promises.forEach(ite, operand, f)
 
-fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<List<T>> {
-    return Promises.whenAll(*promises)
-}
+fun <T> promiseWhenAll(vararg promises: Promise<T>): Promise<List<T>> = Promises.whenAll(*promises)
 
-fun <T> promiseWhenAny(vararg promises: Promise<T>): Promise<T> {
-    return Promises.whenAny(*promises)
-}
+fun <T> promiseWhenAny(vararg promises: Promise<T>): Promise<T> = Promises.whenAny(*promises)
 
-fun <T> promiseSuccess(value: T): Promise<T> {
-    return Promises.success(value)
-}
+fun <T> promiseSuccess(value: T): Promise<T> = Promises.success(value)
 
-fun <T> promiseFail(e: Throwable): Promise<T> {
-    return Promises.fail(e)
-}
+fun <T> promiseFail(e: Throwable): Promise<T> = Promises.fail(e)
 
-fun <T> promiseCancel(): Promise<T> {
-    return Promises.cancel<T>()
-}
+fun <T> promiseCancel(): Promise<T> = Promises.cancel<T>()
 
-fun <T> promiseNotImpl(): Promise<T> {
-    return Promises.notImpl<T>()
-}
+fun <T> promiseNotImpl(): Promise<T> = Promises.notImpl<T>()
 
-fun <T> deferSuccess(value: T): Deferred<T> {
-    return Defer.success(value)
-}
+fun <T> deferSuccess(value: T): Deferred<T> = Defer.success(value)
 
-fun <T> deferFail(e: Throwable): Deferred<T> {
-    return Defer.fail(e)
-}
+fun <T> deferFail(e: Throwable): Deferred<T> = Defer.fail(e)
 
-fun <T> deferCancel(): Deferred<T> {
-    return Defer.cancel()
-}
+fun <T> deferCancel(): Deferred<T> = Defer.cancel()
 
-fun <T> deferNotImpl(): Deferred<T> {
-    return Defer.notImpl()
-}
+fun <T> deferNotImpl(): Deferred<T> = Defer.notImpl()
 
-fun <T> defer(f: () -> T): Deferred<T> {
-    return deferSuccess(f())
-}
+fun <T> defer(f: () -> T): Deferred<T> = deferSuccess(f())
 
 fun <T> deferrable(f: (Deferrable<T>) -> Unit): Deferred<T> {
     return Deferrable<T>().apply {
@@ -218,18 +187,13 @@ inline fun <T, R> Result<T>.whenFailed(f: (Exception) -> R, whenSucceeded: (T) -
     return whenSucceeded(this.value)
 }
 
-inline fun <T, R> ResultParams<T>.whenSucceeded(f: (T) -> R): R? {
-    return this.asResult().whenSucceeded(f)
-}
+inline fun <T, R> ResultParams<T>.whenSucceeded(f: (T) -> R): R? = this.asResult().whenSucceeded(f)
 
-inline fun <T, R> ResultParams<T>.whenSucceeded(f: (T) -> R, whenFailed: (Exception) -> R): R? {
-    return this.asResult().whenSucceeded(f, whenFailed)
-}
+inline fun <T, R> ResultParams<T>.whenSucceeded(f: (T) -> R, whenFailed: (Exception) -> R): R? =
+        this.asResult().whenSucceeded(f, whenFailed)
 
-inline fun <T, R> ResultParams<T>.whenFailed(f: (Exception) -> R): R? {
-    return this.asResult().whenFailed(f)
-}
+inline fun <T, R> ResultParams<T>.whenFailed(f: (Exception) -> R): R? =
+        this.asResult().whenFailed(f)
 
-inline fun <T, R> ResultParams<T>.whenFailed(f: (Exception) -> R, whenSucceeded: (T) -> R): R? {
-    return this.asResult().whenFailed(f, whenSucceeded)
-}
+inline fun <T, R> ResultParams<T>.whenFailed(f: (Exception) -> R, whenSucceeded: (T) -> R): R? =
+        this.asResult().whenFailed(f, whenSucceeded)
