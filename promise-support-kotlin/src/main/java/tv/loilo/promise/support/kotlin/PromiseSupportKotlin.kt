@@ -32,9 +32,7 @@ fun <TData> createPromiseLoader(
         createPromise: (PromiseLoader<TData>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null): PromiseLoader<TData> {
     return object : PromiseLoader<TData>(context) {
-        override fun onCreatePromise(): Promise<TData> {
-            return createPromise(this)
-        }
+        override fun onCreatePromise(): Promise<TData> = createPromise(this)
 
         override fun onClearDataCache(cache: TData) {
             clearDataCache?.invoke(cache)
@@ -48,9 +46,8 @@ fun <TData, TProgress> createProgressPromiseLoader(
         shouldAttachProgressCallback: Boolean,
         createPromise: (ProgressPromiseLoader<TData, TProgress>) -> Promise<TData>,
         clearDataCache: ((TData) -> Unit)? = null)
-        : ProgressPromiseLoader<TData, TProgress> {
-    return ProgressPromiseLoader.createLoader(context, loaderCallbacks, shouldAttachProgressCallback, createPromise, clearDataCache)
-}
+        : ProgressPromiseLoader<TData, TProgress> =
+        ProgressPromiseLoader.createLoader(context, loaderCallbacks, shouldAttachProgressCallback, createPromise, clearDataCache)
 
 fun <TData, TProgress> LoaderManager.attachProgressCallback(id: Int, loaderCallbacks: ProgressPromiseLoaderCallbacks<TData, TProgress>) {
     ProgressPromiseLoader.attachProgressCallback(this, id, loaderCallbacks)
