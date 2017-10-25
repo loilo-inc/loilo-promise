@@ -138,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private ProgressBar mProgressBar;
-    private RecyclerView mRecyclerView;
     private Adapter mAdapter = new Adapter();
 
     @Override
@@ -147,11 +146,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mProgressBar = (ProgressBar) findViewById(R.id.main_progress_bar);
-        mRecyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
 
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        mRecyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(mAdapter);
 
         getSupportLoaderManager().initLoader(0, Bundle.EMPTY, mLoaderCallbacks);
     }
@@ -172,12 +171,12 @@ public class MainActivity extends AppCompatActivity {
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
         }
     }
 
-    class Adapter extends RecyclerView.Adapter<ViewHolder> {
+    private class Adapter extends RecyclerView.Adapter<ViewHolder> {
 
         private List<String> mList = new ArrayList<>();
 
@@ -197,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             return mList.size();
         }
 
-        public void load(List<String> list) {
+        void load(List<String> list) {
             mList = list;
             notifyDataSetChanged();
         }

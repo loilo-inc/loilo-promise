@@ -28,9 +28,6 @@ import tv.loilo.promise.kotlin.promiseWhen
 import tv.loilo.promise.support.PromiseLoaderCallbacks
 import tv.loilo.promise.support.kotlin.createPromiseLoader
 
-/**
- * Created by pepeotoito on 2016/01/02.
- */
 class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit> {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

@@ -172,7 +172,7 @@ public class SampleProgressBarDialogFragment extends AppCompatDialogFragment {
         return null;
     }
 
-    public interface OnFinishedListener {
+    interface OnFinishedListener {
 
         void onSampleProgressBarCanceled();
 

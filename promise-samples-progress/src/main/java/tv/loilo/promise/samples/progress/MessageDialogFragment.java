@@ -23,9 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
 
-/**
- * Created by pepeotoito on 2015/12/26.
- */
 public class MessageDialogFragment extends AppCompatDialogFragment {
 
     private static final String MESSAGE_TAG = "message";
