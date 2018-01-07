@@ -18,6 +18,7 @@ package tv.loilo.promise.samples.errorhandling
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import tv.loilo.promise.kotlin.promiseWhen
 
 class MainActivity : AppCompatActivity() {
@@ -26,11 +27,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById(R.id.crash_on_error_button)?.setOnClickListener {
+        findViewById<View>(R.id.crash_on_error_button)?.setOnClickListener {
             ErrorOnCrashDialogFragment().show(supportFragmentManager, null)
         }
 
-        findViewById(R.id.crash_on_unhandled_exception_button)?.setOnClickListener {
+        findViewById<View>(R.id.crash_on_unhandled_exception_button)?.setOnClickListener {
             promiseWhen<Unit> {
                 throw Exception()
             }.submit()

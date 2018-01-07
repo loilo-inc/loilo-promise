@@ -34,8 +34,8 @@ class MessageDialogFragment : AppCompatDialogFragment() {
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val message = arguments.getString(MESSAGE_TAG)
-        return AlertDialog.Builder(context, theme)
+        val message = arguments?.getString(MESSAGE_TAG)
+        return AlertDialog.Builder(context!!, theme)
                 .setMessage(message)
                 .setPositiveButton("Close", { _, _ ->
 

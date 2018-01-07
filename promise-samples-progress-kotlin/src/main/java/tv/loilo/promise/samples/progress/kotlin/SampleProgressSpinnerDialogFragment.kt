@@ -43,7 +43,7 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
         }
 
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createPromiseLoader(context, {
+            return createPromiseLoader(context!!, {
                 promiseWhen {
                     defer {
                         TimeUnit.SECONDS.sleep(10)

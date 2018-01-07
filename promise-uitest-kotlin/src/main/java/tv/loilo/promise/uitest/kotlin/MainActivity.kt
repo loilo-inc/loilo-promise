@@ -18,6 +18,7 @@ package tv.loilo.promise.uitest.kotlin
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Toast
 import tv.loilo.promise.Cancellable
 import tv.loilo.promise.kotlin.postOnBgWithCancel
@@ -33,7 +34,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById(R.id.greet_after_3sec_button)?.setOnClickListener {
+        findViewById<View>(R.id.greet_after_3sec_button)?.setOnClickListener {
             uiCancellable?.cancel()
             uiCancellable = postOnUiWithCancel({
                 val threadId = Thread.currentThread().id
@@ -41,12 +42,12 @@ class MainActivity : AppCompatActivity() {
             }, 3000)
         }
 
-        findViewById(R.id.cancel_button)?.setOnClickListener {
+        findViewById<View>(R.id.cancel_button)?.setOnClickListener {
             uiCancellable?.cancel()
             uiCancellable = null
         }
 
-        findViewById(R.id.bg_greet_after_3sec_button)?.setOnClickListener {
+        findViewById<View>(R.id.bg_greet_after_3sec_button)?.setOnClickListener {
             bgCancellable?.cancel()
             bgCancellable = postOnBgWithCancel({
                 val threadId = Thread.currentThread().id
@@ -56,7 +57,7 @@ class MainActivity : AppCompatActivity() {
             }, 3000)
         }
 
-        findViewById(R.id.bg_cancel_button)?.setOnClickListener {
+        findViewById<View>(R.id.bg_cancel_button)?.setOnClickListener {
             bgCancellable?.cancel()
             bgCancellable = null
         }

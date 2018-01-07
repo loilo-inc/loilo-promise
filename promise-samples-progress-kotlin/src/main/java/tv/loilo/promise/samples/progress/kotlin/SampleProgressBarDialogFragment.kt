@@ -48,7 +48,7 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
         }
 
         override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createProgressPromiseLoader(context, this, isStarted, { loader ->
+            return createProgressPromiseLoader(context!!, this, isStarted, { loader ->
                 promiseWhen {
                     defer {
                         for (i in 0..99) {

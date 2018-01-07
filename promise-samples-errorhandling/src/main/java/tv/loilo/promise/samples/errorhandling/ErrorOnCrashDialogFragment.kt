@@ -45,7 +45,7 @@ class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit
     }
 
     override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-        return createPromiseLoader(context, {
+        return createPromiseLoader(context!!, {
             promiseWhen {
                 defer<Unit> {
                     throw Error("Throw test error.(Crash expected.)")
