@@ -47,8 +47,9 @@ class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit
         loaderManager.initLoader(0, Bundle.EMPTY, this)
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-        return createPromiseLoader(context, {
+    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>> {
+        //TODO context!!でいいのか？
+        return createPromiseLoader<Unit>(context!!, {
             promiseWhen {
                 defer<Unit> {
                     throw Error("Throw test error.(Crash expected.)")
@@ -57,7 +58,8 @@ class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit
         })
     }
 
-    override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>?) {
+
+    override fun onLoadFinished(loader: Loader<Result<Unit>>, data: Result<Unit>) {
         postOnUi {
             if (isResumed) {
                 dismiss()
@@ -65,7 +67,9 @@ class ErrorOnCrashDialogFragment : DialogFragment(), PromiseLoaderCallbacks<Unit
         }
     }
 
-    override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
+
+
+    override fun onLoaderReset(loader: Loader<Result<Unit>>) {
 
     }
 }

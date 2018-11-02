@@ -38,12 +38,13 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
     }
 
     private val loaderCallbacks = object : PromiseLoaderCallbacks<Unit> {
-        override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
+        override fun onLoaderReset(loader: Loader<Result<Unit>>) {
 
         }
 
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createPromiseLoader(context, {
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>> {
+            // TODO context!!でいいのか？
+            return createPromiseLoader(context!!, {
                 promiseWhen {
                     defer {
                         TimeUnit.SECONDS.sleep(10)
@@ -52,14 +53,14 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
             })
         }
 
-        override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>?) {
+        override fun onLoadFinished(loader: Loader<Result<Unit>>, data: Result<Unit>) {
 
             postOnUi {
                 if (isResumed) {
 
                     dismiss()
 
-                    data?.whenSucceeded({
+                    data.whenSucceeded({
                         resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerSucceeded()
                     }, whenFailed = {
                         resolveListener<OnFinishedListener>()?.onSampleProgressSpinnerFailed(it)

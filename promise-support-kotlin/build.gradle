@@ -2,12 +2,10 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
-
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 24
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode Integer.parseInt(VERSION_CODE)
         versionName VERSION_NAME
     }
@@ -17,28 +15,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
+//    sourceSets {
+//        main.java.srcDirs += 'src/main/kotlin'
+//    }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile "com.android.support:support-fragment:${android_support_version}"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:${kotlin_version}"
-    compile project(':promise')
-    compile project(':promise-kotlin')
-    compile project(':promise-support')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.android.support:support-fragment:$android_support_version"
+    implementation project(':promise')
+    implementation project(':promise-kotlin')
+    implementation project(':promise-support')
+    testImplementation 'junit:junit:4.12'
 }
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlin_version}"
-    }
-}
-repositories {
-    mavenCentral()
-}
+

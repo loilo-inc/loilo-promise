@@ -1,12 +1,10 @@
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
-
+    compileSdkVersion 28
     defaultConfig {
-        minSdkVersion 9
-        targetSdkVersion 24
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode Integer.parseInt(VERSION_CODE)
         versionName VERSION_NAME
     }
@@ -19,10 +17,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile "com.android.support:support-fragment:${android_support_version}"
-    compile project(':promise')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:support-fragment:$android_support_version"
+    implementation project(':promise')
+    testImplementation 'junit:junit:4.12'
 }
 
 apply from: rootProject.file('gradle/gradle-mvn-push.gradle')

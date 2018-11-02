@@ -43,12 +43,13 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
     private var isStarted: Boolean = false
 
     private var loaderCallbacks = object : ProgressPromiseLoaderCallbacks<Unit, Int> {
-        override fun onLoaderReset(loader: Loader<Result<Unit>>?) {
+        override fun onLoaderReset(loader: Loader<Result<Unit>>) {
 
         }
 
-        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>>? {
-            return createProgressPromiseLoader(context, this, isStarted, { loader ->
+        override fun onCreateLoader(id: Int, args: Bundle?): Loader<Result<Unit>> {
+            // TODO context!!でいいのか？
+            return createProgressPromiseLoader(context!!, this, isStarted, { loader ->
                 promiseWhen {
                     defer {
                         for (i in 0..99) {
@@ -61,13 +62,13 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
             })
         }
 
-        override fun onLoadFinished(loader: Loader<Result<Unit>>?, data: Result<Unit>?) {
+        override fun onLoadFinished(loader: Loader<Result<Unit>>, data: Result<Unit>) {
             postOnUi {
                 if (isResumed) {
 
                     dismiss()
 
-                    data?.whenSucceeded({
+                    data.whenSucceeded({
                         resolveListener<OnFinishedListener>()?.onSampleProgressBarSucceeded()
                     }, whenFailed = {
                         resolveListener<OnFinishedListener>()?.onSampleProgressBarFailed(it)

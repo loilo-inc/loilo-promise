@@ -1,13 +1,11 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.3"
-
+    compileSdkVersion 28
     defaultConfig {
         applicationId "tv.loilo.promise.samples.progress"
-        minSdkVersion 9
-        targetSdkVersion 24
+        minSdkVersion 16
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -20,9 +18,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    compile "com.android.support:appcompat-v7:${android_support_version}"
-    compile project(':promise')
-    compile project(':promise-support')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$android_support_version"
+    implementation project(':promise')
+    implementation project(':promise-support')
+    testImplementation 'junit:junit:4.12'
 }

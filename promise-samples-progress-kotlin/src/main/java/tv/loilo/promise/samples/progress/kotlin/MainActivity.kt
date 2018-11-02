@@ -17,6 +17,7 @@
 package tv.loilo.promise.samples.progress.kotlin
 
 import android.os.Bundle
+import android.view.View
 import android.support.v7.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity()
@@ -27,11 +28,11 @@ class MainActivity : AppCompatActivity()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById(R.id.main_show_progress_bar_button)?.setOnClickListener {
+        findViewById<View>(R.id.main_show_progress_bar_button)?.setOnClickListener {
             SampleProgressBarDialogFragment().show(supportFragmentManager, null)
         }
 
-        findViewById(R.id.main_show_progress_spinner_button)?.setOnClickListener {
+        findViewById<View>(R.id.main_show_progress_spinner_button)?.setOnClickListener {
             SampleProgressSpinnerDialogFragment().show(supportFragmentManager, null)
         }
     }
