@@ -77,9 +77,9 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
         val progressDialog = ProgressDialog(context, theme)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
         progressDialog.setMessage("Loading...")
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", { dialogInterface, i ->
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel") { _, _ ->
 
-        })
+        }
         return progressDialog
     }
 
@@ -93,7 +93,7 @@ class SampleProgressSpinnerDialogFragment : AppCompatDialogFragment() {
         super.onStart()
 
         val progressDialog = dialog as? ProgressDialog
-        progressDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.setOnClickListener { view ->
+        progressDialog?.getButton(DialogInterface.BUTTON_NEGATIVE)?.setOnClickListener {
             loaderManager.cancelLoader(LOADER_ID)
         }
     }

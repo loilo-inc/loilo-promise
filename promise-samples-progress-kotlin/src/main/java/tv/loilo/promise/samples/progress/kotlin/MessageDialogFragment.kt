@@ -42,7 +42,7 @@ class MessageDialogFragment : AppCompatDialogFragment() {
         //TODO context!!でいいのか？
         return AlertDialog.Builder(context!!, theme)
                 .setMessage(message)
-                .setPositiveButton("Close", { dialogInterface, i ->
+                .setPositiveButton("Close", { _, _ ->
 
                 }).create()
     }

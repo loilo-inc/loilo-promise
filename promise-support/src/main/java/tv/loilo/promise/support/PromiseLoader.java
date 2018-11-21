@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 
 import tv.loilo.promise.Canceller;
@@ -43,6 +44,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     private boolean mIsCanceling;
     private boolean mIsPending;
 
+    private boolean mHasDataCache;
     @Nullable
     private TData mDataCache;
 
@@ -51,6 +53,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     }
 
     public static void cancelLoader(LoaderManager loaderManager, int id) {
+
         final Loader<?> loader = loaderManager.getLoader(id);
         if (loader == null) {
             return;
@@ -67,6 +70,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     }
 
     protected void clearCaches() {
+        mHasDataCache = false;
         if (mDataCache != null) {
             onClearDataCache(mDataCache);
             mDataCache = null;
@@ -82,7 +86,8 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
         }
     }
 
-    private boolean cancelPromise() {
+    @Override
+    protected boolean onCancelLoad() {
         final Canceller canceller = mCanceller;
         mCanceller = null;
         mIsPending = false;
@@ -95,18 +100,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
     }
 
     @Override
-    protected boolean onCancelLoad() {
-        return cancelPromise();
-    }
-
-    @Override
-    protected void onStopLoading() {
-        cancelLoad();
-    }
-
-    @Override
     protected void onForceLoad() {
-
         if (cancelLoad()) {
             mIsPending = true;
             return;
@@ -121,6 +115,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
                     @Override
                     public void run() {
                         mIsCanceling = false;
+                        mCanceller = null;
 
                         if (params.getCancelToken().isCanceled()) {
                             final TData value = params.getValue();
@@ -129,17 +124,14 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
                             }
 
                             if (!isAbandoned()) {
-                                rollbackContentChanged();
                                 deliverResult(Results.<TData>cancel());
-                                if (mIsPending && isStarted()) {
+                                if (mIsPending) {
                                     forceLoad();
                                 }
                             }
 
                             return;
                         }
-
-                        mCanceller = null;
 
                         Throwable e;
                         try {
@@ -150,7 +142,6 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
 
                         if (e != null) {
                             if (!isAbandoned()) {
-                                rollbackContentChanged();
                                 deliverResult(Results.<TData>fail(e));
                             }
                         } else {
@@ -158,7 +149,7 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
                             final TData value = params.getValue();
                             if (!isAbandoned()) {
                                 mDataCache = value;
-                                commitContentChanged();
+                                mHasDataCache = true;
                                 deliverResult(Results.success(value));
                             } else {
                                 if (value != null) {
@@ -174,19 +165,15 @@ public abstract class PromiseLoader<TData> extends Loader<Result<TData>> {
 
     @Override
     protected void onStartLoading() {
-        if (mDataCache != null) {
+        if (mHasDataCache) {
             deliverResult(Results.success(mDataCache));
-        }
-
-        if (takeContentChanged() || mDataCache == null) {
+        } else if (mCanceller == null) {
             forceLoad();
         }
     }
 
     @Override
     protected void onReset() {
-        onStopLoading();
-
         clearCaches();
     }
 }
