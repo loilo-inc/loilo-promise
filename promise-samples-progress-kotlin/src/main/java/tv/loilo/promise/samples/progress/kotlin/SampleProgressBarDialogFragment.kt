@@ -91,9 +91,9 @@ class SampleProgressBarDialogFragment : AppCompatDialogFragment() {
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.setMessage("Loading...")
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", { _, i ->
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel") { _, _ ->
 
-        })
+        }
         return progressDialog
     }
 
